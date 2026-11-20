@@ -1,0 +1,27 @@
+name: Publish to the MCP Registry
+
+# Publishes server.json under io.github.subclip-app/* with GitHub OIDC (no secrets).
+# Publish the npm package @subclip/mcp at the same version first, and bump "version" in server.json for each release:
+# the registry rejects a version it already has.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - server.json
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install mcp-publisher
+        run: curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz" | tar xz mcp-publisher
+      - name: Log in with GitHub OIDC
+        run: ./mcp-publisher login github-oidc
+      - name: Publish
+        run: ./mcp-publisher publish
