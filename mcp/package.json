@@ -1,0 +1,16 @@
+{
+  "name": "@subclip/mcp",
+  "version": "0.1.0",
+  "description": "Stdio MCP server for the Subclip desktop app: connects any MCP client to the screen recorder, AI video editor, export, publishing and screenshot tools running on your computer.",
+  "mcpName": "io.github.subclip-app/subclip",
+  "type": "module",
+  "license": "MIT",
+  "bin": { "subclip-mcp": "bin/subclip-mcp.mjs" },
+  "files": ["bin", "README.md", "LICENSE"],
+  "engines": { "node": ">=18" },
+  "dependencies": { "@modelcontextprotocol/sdk": "^1.32.2" },
+  "repository": { "type": "git", "url": "git+https://github.com/subclip-app/subclip-skills.git", "directory": "mcp" },
+  "homepage": "https://www.subclip.app/products/mcp-server",
+  "keywords": ["mcp", "model-context-protocol", "subclip", "video-editing", "screen-recorder", "claude", "codex", "cursor"],
+  "publishConfig": { "access": "public" }
+}
