@@ -1,0 +1,4 @@
+{
+  "comment": "Skills that stay inside the Subclip repo. The sync script skips them and the check fails if one appears in skills/.",
+  "skills": ["subclip-qa"]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Subclip Public Assets"
+  short_description: "Search and import public media and audio"
+  default_prompt: "Use $subclip-public-assets to find and import a suitable public asset."
