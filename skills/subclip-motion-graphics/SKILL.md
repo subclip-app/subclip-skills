@@ -97,3 +97,7 @@ MediaPanel does not register standalone `.svg` files. When the creator supplies 
 11. If this was created from an untitled project, verify that the first-step title remains saved. Re-list or re-read the project and only report that title when saved state contains it. Do not rename an existing creator-authored project.
 
 If live frame capture fails, keep the Motion-panel items saved and report visual verification as unavailable. Never claim the motion graphic exists when `motionItems` is empty, and never claim a text-only fallback satisfies a motion-graphics request unless the user accepts that fallback.
+
+## Media that will not load
+
+**If any media fails to load** (preview or export shows "Error loading image", a blank card, a broken video, or a CORS/CSP error for a URL), do not retry the URL. Import that file into the project first: `import_external_media` with the local `path` (or the `url`) and `addToTimeline: false`, or `insert_workspace_asset` for a workspace asset such as a brand logo. Then read the asset's URL from `list_editor_assets` and put that `subclip-media://asset/<id>` URL in the prop or source instead. Many public hosts (including Subclip's own public bucket) send no CORS header, so the exporter cannot load them; project media always loads. Re-export and look at the frame to confirm.
