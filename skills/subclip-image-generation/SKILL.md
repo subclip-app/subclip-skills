@@ -5,7 +5,7 @@ description: Generate persistent cloud images with Subclip AI from text and supp
 
 # Subclip Image Generation
 
-Subclip cloud image generation is optional and uses AI credits. If you have your own image generation (Codex, a Grok bot, another provider) you may use it instead and bring the picture in with `import_external_media` (see `$subclip-asset-creation`); use this skill when the user asks for Subclip generation or its models are the best fit.
+Subclip cloud image generation is optional and uses AI credits. First check the creator's own generators: when the Codex CLI or Grok CLI is signed in and working here, ask once (unless the creator already chose) whether to use it without Subclip credits, then bring the picture in with `import_external_media`. See [creator CLI generators](../subclip-ai-generation/references/creator-cli-generators.md). Use this skill when the creator chooses Subclip, when no CLI works, or when its models fit best.
 
 Follow `$subclip-ai-generation` for quota, credits, async completion, history, and deletion.
 

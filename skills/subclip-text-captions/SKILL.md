@@ -9,6 +9,10 @@ Distinguish text overlays from spoken-word captions.
 
 When the creator asks for text, titles, or subtitles behind a person, behind the subject, or between the subject and the original background, route to `$subclip-text-behind-subject`. It owns the required media duplication, background removal, and composition-plane order; this skill alone must not place the text on top of the subject.
 
+## Look before placing text and captions
+
+Before adding or moving any text layer, title or caption style, look at the frames it will sit on: `get_timeline_contact_sheet` with `times` covering the text's time range (or `at: "caption-pages"` for captions). Find where the key subject is (faces, product, chart, the thing the narration talks about) and put the text in empty space, away from other text. Captions and on-frame titles must never overlap each other or cover the key element; if a frame has no free area, move the title to another beat, shrink it, or give it a backing strip. After placing, render the same times again and check. Per-clip caption styles override the project-wide style, so after per-item transcription check that the style change actually shows.
+
 ## Text overlays
 
 1. Call `add_text_overlay` with text, timing, position, font size, and color.
@@ -32,7 +36,7 @@ When the creator asks for text, titles, or subtitles behind a person, behind the
 When the creator asks for dynamic, viral, scroll-stopping, emphasized, word-by-word, or preset-based captions, route to `$subclip-dynamic-captions`. When the creator names a HyperFrames caption style or wants captions authored as a HyperFrames layer, route to `$subclip-hyperframes-captions`. Keep this skill for transcription, corrections, speakers, visibility/deletion, and ordinary caption styling.
 
 1. Read existing caption words before changing them.
-2. Use `update_caption_words` for wording and timing corrections. Use `update_caption_style` for project-wide caption typography, colors, background card, outline, shadow, placement, width, or animation. Do not use guarded raw state for controls exposed by that named tool.
+2. Use `update_caption_words` for wording and timing corrections. Use `update_caption_style` for project-wide caption typography, colors, background card, outline, shadow, placement, width, or animation. It applies to every word: the changed fields are also removed from per-word preset overrides and per-clip styles. Re-applying a preset resets style fields (not the position) to the preset, so style after the preset. Do not use guarded raw state for controls exposed by that named tool.
    - Use `assign_caption_speaker` when one caption page, sentence, or time range is assigned to the wrong speaker. Select an existing `speakerId`; this must not rename other segments.
    - Use `create_caption_speaker` when the creator needs a new named identity that is not in the current speaker list, then use `assign_caption_speaker` to apply it to the intended segment.
    - Use `rename_caption_speaker` when the creator wants one identity renamed everywhere, such as `Speaker A` to `Female`. This updates the speaker list and every assigned caption word.
@@ -45,6 +49,18 @@ When the creator asks for dynamic, viral, scroll-stopping, emphasized, word-by-w
 6. Store the `jobId` returned by every local or cloud `transcribe_project` call. For the in-app coding agent, do not poll: the host resumes the same conversation only after completion, a concrete error, or cancellation. On an exact-item run, existing captions from every other source remain present and are not proof that the new job completed. Do not manually move the completed words or interpret an unchanged total word count as success or failure. External MCP clients may call `get_transcription_status` with `projectId` and the exact `jobId`.
 7. Use `stop_transcription` whenever the user asks to stop, cancel, replace, or abandon transcription. One call stops local Whisper, aborts the desktop cloud job, and sends cancellation to its active Subclip Cloud server run. The tool is safe when no run is active; inspect its `serverCancellation` result instead of assuming a remote run existed.
 8. Preserve chronological word order, nonnegative times, and readable page grouping.
+
+## Edit by script
+
+Text-based editing: cutting words cuts the video. Use it when the creator asks to remove words, sentences, filler words ("um", "uh", "like", "you know"; "euh", "ben", "tu vois") or long pauses from what is said, or to tighten a talk. The creator does the same in the Script panel (right side of the editor, opened from the captions track); both share one cut engine.
+
+1. Call `get_script` first. It returns paragraphs of caption words with `id`, `text`, `start`, `end` (timeline seconds), pauses, and words already cut (`deletedCutId`). Pick words by id, never by guessed times.
+2. `cut_script_words` with `wordIds` (or `startSeconds`/`endSeconds`) is a ripple delete: the media and audio under the words are split by source time and removed, and everything after moves left on every lane (video, audio, text, elements, motion, HyperFrames, Remotion, 3D). Captions keep their clips. Music beds and looped clips are shortened, not split. This is not `delete_caption_segment`, which removes caption text only and leaves the video.
+3. For fillers and pauses: `propose_script_cleanup` (read-only) lists candidates with an index; show the creator the count and anything doubtful ("like" can be a real word). Then `apply_script_cleanup` with the returned `revision`, `confirm: true`, the same options, and `excludeIndexes` for kept words. Defaults: pauses longer than 1 s, 0.15 s kept on each side.
+4. Every cut can be undone exactly with `restore_script_cut` and its cut id or group id (one call's cuts share a group). Undo in the editor works too.
+5. "Fix the word" or "it says X, not Y" changes caption text only: use `update_caption_words`, not a cut.
+   - To keep the video but drop words from the captions (a word that should not be shown, a profanity bleeped in sound only), call `hide_script_words` with `hidden: true`; `hidden: false` shows them again. Hidden words stay in `get_script` with `hidden: true` (the Script panel shows them with one strike line); cut words show with a double strike. A hidden word can still be cut, and restoring that cut brings it back hidden.
+6. After cutting, re-read with `get_script` and check a frame on each side of a cut with `view_current_frame` when the creator cares about the jump. A Script panel "Ask AI" note arrives as a numbered video edit with the word ids and time range; report it with `report_video_edit`.
 
 ## Speaker-aware transcription
 

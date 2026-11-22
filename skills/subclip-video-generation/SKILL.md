@@ -7,6 +7,8 @@ description: Generate persistent cloud video with Subclip AI from text and model
 
 Follow `$subclip-ai-generation` for quota, credits, async completion, history, and deletion.
 
+If the Grok CLI is signed in and working here, its `reference_to_video` tool can animate images on the creator's own plan: ask once (unless the creator already chose) and see [creator CLI generators](../subclip-ai-generation/references/creator-cli-generators.md). Codex makes images only, not video.
+
 Call `list_ai_models` with `kind: video`. Select a live model by its `acceptedInputs`, `maxAssets`, required input, duration policy, resolution policy, end-frame support, and generated-audio support. Never send a duration or reference type outside that schema. Pass project inputs through `sourceAssets` using exact `sourceFileId` or `sourceItemId` values from `list_editor_assets`; use the explicit `start_frame`, `end_frame`, `reference`, `source_video`, or `audio_reference` role when the model distinguishes them. Source-duration models such as video-to-video editing require readable duration metadata and must use that duration for billing. Call `generate_ai_media` with `kind: video` and `confirmed: true` once when the current request authorizes those exact settings, then end the turn after it is accepted; do not poll.
 
 Import a completed result as a normal MediaPanel video. Generated audio belongs to that video unless the user explicitly asks to extract it as an AudioPanel item.

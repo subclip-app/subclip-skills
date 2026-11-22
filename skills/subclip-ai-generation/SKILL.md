@@ -5,7 +5,9 @@ description: Discover and run Subclip cloud image, video, video-avatar, music, a
 
 # Subclip AI Generation
 
-Subclip generation is optional. Any agent may instead generate media with its own tools or providers (Codex image generation, a Grok bot, a local model) and import the file with `import_external_media` (path, https URL or base64); that path uses no Subclip credits. Use Subclip's `subclip_ai_editor` MCP server for generation when the user asks for it or its models fit best. Generated outputs are persistent cloud records, appear in the project chat and AI Generations panel, consume AI credits, and count toward the signed-in user's cloud-storage quota.
+Subclip generation is optional. Any agent may instead generate media with its own tools or providers and import the file with `import_external_media` (path, https URL or base64); that path uses no Subclip credits.
+
+**Creator's own generators first.** Before Subclip image or video generation, check whether the Codex CLI (images) or the Grok CLI (images and video) is signed in and working on this computer. If one is and the creator has not chosen a generator, ask once whether to use it (no Subclip credits) or Subclip's models; if the creator already said which, use that without asking. Read [creator CLI generators](references/creator-cli-generators.md) for the check, the commands and the fallback. Use Subclip's `subclip_ai_editor` MCP server for generation when the creator chooses it, when no CLI works, or for what the CLIs cannot do (avatars, lip-sync, music, speech). Generated outputs are persistent cloud records, appear in the project chat and AI Generations panel, consume AI credits, and count toward the signed-in user's cloud-storage quota.
 
 ## Plan mode
 

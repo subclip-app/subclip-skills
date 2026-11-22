@@ -1,17 +1,36 @@
 {
   "name": "@subclip/skills",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Agent skills for the Subclip AI Video Editor, installed for Claude Code, Codex and other agents",
   "type": "module",
   "license": "MIT",
-  "bin": { "subclip-skills": "bin/cli.mjs" },
-  "files": ["bin", "skills", "dev-only.json", "README.md", "LICENSE"],
-  "engines": { "node": ">=18" },
+  "bin": {
+    "subclip-skills": "bin/cli.mjs"
+  },
+  "files": [
+    "bin",
+    "skills",
+    "dev-only.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "sync": "node scripts/sync-skills.mjs",
     "check": "node test/check.mjs",
     "prepublishOnly": "node scripts/sync-skills.mjs && node test/check.mjs"
   },
-  "publishConfig": { "access": "public" },
-  "keywords": ["subclip", "agent-skills", "claude-code", "codex", "mcp", "video-editing"]
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "subclip",
+    "agent-skills",
+    "claude-code",
+    "codex",
+    "mcp",
+    "video-editing"
+  ]
 }
