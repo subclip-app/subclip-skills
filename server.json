@@ -3,7 +3,7 @@
   "name": "io.github.subclip-app/subclip",
   "title": "Subclip",
   "description": "Local AI video editor and screen recorder: record, edit, caption, export and publish videos.",
-  "version": "0.3.0",
+  "version": "0.1.0",
   "websiteUrl": "https://www.subclip.app/products/mcp-server",
   "repository": {
     "url": "https://github.com/subclip-app/subclip-skills",
@@ -14,7 +14,7 @@
     {
       "registryType": "npm",
       "identifier": "@subclip/mcp",
-      "version": "0.3.0",
+      "version": "0.1.0",
       "transport": { "type": "stdio" },
       "environmentVariables": [
         {
