@@ -40,6 +40,14 @@ Never move, merge, archive or delete older projects or workspaces unless the cre
 - After a session where the creator liked a reusable element, offer to save it as a template, and offer to record new preferences in WORKSPACE.md (Dos, Don'ts, Notes).
 - `update_workspace_template`, `delete_workspace_templates`, `copy_workspace_template` (to another workspace).
 
+## Gallery templates and favourites
+
+These are the Motion Graphics gallery (catalog) templates, not the snapshot templates above.
+
+- The creator stars gallery templates; `list_favorite_templates` returns them (catalogId, name, kind, category, aspectRatio, width, height, duration, importTool). Prefer them when a motion graphic is needed. `set_favorite_template` stars or unstars one.
+- A workspace can hold saved gallery templates: `list_workspace_gallery_templates` (one workspace or all), `save_gallery_template_to_workspace`, `remove_gallery_template_from_workspace`. `get_workspace` and `get_project_director_brief` list them as `galleryTemplates` and `favouriteTemplates`.
+- To start from one, `create_project_from_template` makes a project at the template's own canvas (9:16 for vertical social templates) with it placed and named after it. To add one to an existing project, use its `importTool` (`add_runtime_layer` or `add_html_motion_graphic`) with `importArguments`.
+
 ## Skills per workspace
 
 Installed skills can be limited to workspaces with `set_skill_enabled` (`workspaceIds`); only do this when the creator asks. A workspace's `favoriteSkills` (favourites category `skills`) are the installed skills the creator prefers there: use them first when they fit the task. Follow `subclip-skill-gateway` for any installed skill.

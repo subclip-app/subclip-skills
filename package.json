@@ -1,6 +1,6 @@
 {
   "name": "@subclip/skills",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Agent skills for the Subclip AI Video Editor, installed for Claude Code, Codex and other agents",
   "type": "module",
   "license": "MIT",

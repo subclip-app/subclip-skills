@@ -45,6 +45,9 @@
 ## Create and arrange
 
 - `create_project`: create a separate empty same-owner project with its own stable ID/package/history; intended for an explicitly requested multi-project workflow
+- `create_project_from_template`: new project at a gallery template's own canvas with the template placed (catalogId from `list_favorite_templates` or `list_motion_graphics_templates`)
+- `list_favorite_templates`, `set_favorite_template`: the creator's starred gallery templates
+- `list_workspace_gallery_templates`, `save_gallery_template_to_workspace`, `remove_gallery_template_from_workspace`: gallery templates saved in workspaces
 - `clone_project`: create a separately editable variant of a same-owner project without changing its source
 - `authorize_multi_project_editing`: grant the current agent session write access to exact existing same-owner project IDs after explicit user authorization; grants expire with the session
 - `get_project_chat_history`: read same-owner project conversation summaries or one sanitized user/assistant transcript; use original prompts and follow-ups as supporting intent context while live saved state remains authoritative
@@ -108,7 +111,11 @@ Use the dependency already provided by Subclip. If the import is unavailable, ch
 - `propose_script_cleanup` (read-only) / `apply_script_cleanup`: list then cut filler words (en, fr) and long pauses; apply needs the proposed `revision`, `confirm: true`, and optional `excludeIndexes`
 - `set_caption_speaker_visibility`: hide or restore all rendered captions assigned to one speaker
 - `convert_captions_to_hyperframes`: turn native caption words into one transparent HyperFrames caption layer (words kept in layer variables), hiding the native captions reversibly; re-run updates the same layer; pass `script` to caption generated speech directly with no transcription; see `$subclip-hyperframes-captions`
+- `get_audio_timeline_sheet` (read-only): see the sound. One image plus JSON for a time window (`startSeconds`, `endSeconds`, max 300 s): lanes for voice, music, effects and other with real waveforms, mix waveform, spectrogram, LUFS curve with -14/-16 lines, cut marks and sound starts; warnings for peaks above -1 dBTP, clipping, silence over 1.5 s, overlapping effects, music too loud under the voice, cuts without sound (`cutSync.percentInSync`)
 - `view_frame`: quick look at 1-8 moments as small JPEGs (default 720 px, rendered at that size, cached while the project is unchanged); use it while iterating, `view_current_frame` for the final full-size check, `skipHyperframes:true` when HyperFrames layers are not the point (on Linux without a GPU a heavy HyperFrames layer is left out automatically and the result says so; pass `skipHyperframes:false` to force it, which can take minutes)
+- `get_app_update_status` (read-only): app version, update phase (idle, checking, downloading, ready, up-to-date, error), percent, available version, `installPending`, and `canInstallNow` with the reason when a recording, export or download is running
+- `check_for_app_update`: start an update check (same as Check for Updates in the menu bar); a newer version downloads by itself and waits for a restart, nothing restarts
+- `install_app_update_and_restart` (destructive, needs `confirm:true`): restart to install a downloaded update; refused when no update is ready or work is running unless `force:true`; relaunches into the menu bar only, MCP is down for a few seconds. Use only when the creator asked for the update
 - `reset_background_processes`: fix a stuck render without quitting (stops HyperFrames renders, kills leftover render browsers); `restart:true` relaunches Subclip into the menu bar only and is refused while a window is open or a recording or export runs. Never ask the user to quit the app; an MCP client cannot reopen it
 - `restore_native_captions`: undo that conversion: un-hide exactly the words it hid and remove the HyperFrames caption layer
 - `update_media_item`: complete native MediaPanel controls—trim, sound, playback, crop/focus, transform/container, opacity/fades, style/effects, transition type and UI animation speed, composition-plane placement, lane, and z-order
