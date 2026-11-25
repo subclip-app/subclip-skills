@@ -20,7 +20,8 @@
   "scripts": {
     "sync": "node scripts/sync-skills.mjs",
     "check": "node test/check.mjs",
-    "prepublishOnly": "node scripts/sync-skills.mjs && node test/check.mjs"
+    "prepublishOnly": "node scripts/sync-skills.mjs && node test/check.mjs",
+    "release:tag": "node scripts/tag-release.mjs"
   },
   "publishConfig": {
     "access": "public"
