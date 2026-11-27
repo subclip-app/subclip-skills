@@ -15,14 +15,14 @@ Tile left and right are image left and right. Say "image left" in your notes to 
 
 - `camera`: eyes on the lens. The head may be slightly turned if the irises point back at the lens. A hand gesture toward the camera is still `camera`.
 - `screen`: reading (a script, notes, or a stream's chat). Eyes toward the screen direction from step 1, even with a frontal head. Signs: irises pushed to one side; irises raised with white showing below; eyelids lowered toward a screen below the lens.
-- `away`: head turned far off (profile), head tilted back, face covered (hand, towel, cup), looking around the room, face out of the tile.
+- `away`: head turned far off (profile), head tilted back, face covered (hand, towel, cup), looking around the room, face out of the frame. A tile with a `NO FACE` badge is often `away`; check it rather than assume.
 - `unclear`: you cannot tell. Before you leave a tile unclear, render a zoom sheet on it.
 
 Judge the eyes, not the head. A frontal head with eyes on the screen is `screen`; a turned head with irises on the lens is `camera`.
 
 ## 3. Zoom on doubt
 
-`get_timeline_contact_sheet` on the scratch project with `times` set to the doubtful tile and the quarter steps around it (for example 12.25, 12.5, 12.75), `tileWidth: 480`, `detail: "full"`, `columns: 3`. A zoom check at a time that is not on the 0.5 s grid (for example `62.75 camera`) is allowed: it adds an extra point and sharpens a window edge (see window-rules.md, step 0).
+`get_media_contact_sheet` on the same target with `times` set to the doubtful tile and the quarter steps around it (for example 12.25, 12.5, 12.75), `faceCrop: {scale: 1.1}`, `tileSize: 480`, `columns: 3`. A zoom check at a time that is not on the 0.5 s grid (for example `62.75 camera`) is allowed: it adds an extra point and sharpens a window edge (see window-rules.md, step 0).
 
 Zoom every frontal face that might be a slightly raised look. That is the main failure case.
 

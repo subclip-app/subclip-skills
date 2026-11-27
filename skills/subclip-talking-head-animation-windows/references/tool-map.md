@@ -4,43 +4,39 @@ Every step uses Subclip MCP tools only. Pass `projectId` on every call and send 
 
 ## 1. Find the camera source
 
-| Need | Tool | Notes |
+| Need | Tool | Target for the sheet tools |
 |---|---|---|
-| Subclip recordings | `list_recordings` | The camera file is `<Projects folder>/<recordingId>.subclip/webcam.mp4`; the voice is `microphone.m4a` beside it (the webcam file usually has no audio). Both start at the same time. |
-| A clip already in an edit | `get_project_outline`, then `read_project_section` (`lane: "media"`) | Take the talking-head item, its source path and its `startTime`. Times on the timeline are what the windows use. |
+| Subclip recordings | `list_recordings` | `recordingId` + `track: "webcam"`. Times are recording seconds (the track offset is applied). The voice is `microphone.m4a` beside the webcam file (which usually has no audio); both start together. |
+| A clip already in an edit | `get_project_outline`, then `read_project_section` (`lane: "media"`) | `itemId` of the talking-head item (with `projectId`). Times are timeline seconds, mapped through the item's trim and speed, so sheet times are the times the windows use. |
+| Any other local video | | `source` with the file path. Times are file seconds. |
 
-Do not use `get_recording_contact_sheet`, `get_frames` or `capture_recording_frame` for this skill from an outside agent: they need the Recorder assistant (an external MCP client gets "Open the Recorder assistant to edit a recording"), and they cannot crop to the face.
+`get_recording_contact_sheet`, `get_frames` and `capture_recording_frame` now accept a `recordingId` from an external agent even when `projectId` is an editor project, but they show the raw track uncropped. Use `get_media_contact_sheet` for face sheets.
 
-## 2. Locate the face
+## 2. Check the face
 
-`extract_video_frames` with `source` (the camera file), `timesSeconds` (4 to 8 spread over the clip; at most 8 per call), `maxDimension: 480`. Read the face centre `fx, fy` (fractions of width and height) and the face height `hf` (hairline to chin, fraction of the frame height).
+`detect_faces` with the target from section 1 (default: 8 samples spread over the clip; or `everySeconds`, `times`). It runs Subclip's bundled offline face detector and returns, per time, the speaker's face box (`primary`, as 0 to 1 fractions and in pixels), the `medianFace`, a `suggestedCrop` and `suggestedFocus`. It finds faces only; it does not judge gaze.
 
-## 3. Face-crop scratch project
+If `framesWithFace` is low, the face is too small or too dark for the detector: pass a manual `crop` (section 3) around the face instead of `faceCrop`. If the camera is only a small picture-in-picture inside a screen recording (a stream layout), crop that region (`crop`, in source pixels or 0 to 1 fractions) and raise `tileSize` so the eyes are readable.
 
-| Step | Tool and parameters |
-|---|---|
-| Create | `create_project` with `canvasPreset: "square"`, `projectName: "<project> face sheets"`, `durationSeconds` = clip length |
-| Add the camera clip | `import_external_media` with `path` = camera file, `startTime` = the clip's timeline start in the edit (so sheet times equal edit times). Several clips: import each at its own start. |
-| Crop to the face | `update_media_item` with `fitMode: "cover"`, `sourceZoom: Z`, `focusX: fx`, `focusY: fy`, `muted: true`, on every camera item |
-| Check | `get_timeline_contact_sheet` with 4 to 6 `times`, `tileWidth: 256`, `detail: "balanced"` |
+## 3. Face sheets
 
-Start with `Z = 1 / (1.25 * hf)` for a landscape source, then adjust by eye: the tile should run from just above the hair to just below the chin, with both eyes large. The formula tends to come out too tight: in the demo (a face cam scaled to 1280x720, `hf` about 0.52) `Z = 1.3` cut the chin and hair when she moved, and `Z = 1.1` with `focusX: 0.58`, `focusY: 0.5` was right. The crop is fixed, so pick `fx, fy` as the median face position and leave room for head movement.
-
-If the camera is only a small picture-in-picture inside a screen recording (a stream layout), first crop and scale that face cam region so the eyes are readable at 720p, then run the skill on it.
-
-## 4. Sheets
-
-`get_timeline_contact_sheet` on the scratch project:
+`get_media_contact_sheet`:
 
 ```json
-{"projectId": "<scratch>", "from": 0, "to": 23.5, "every": 0.5, "count": 48,
- "tileWidth": 256, "columns": 6, "maxTilesPerSheet": 24, "detail": "balanced", "waitSeconds": 110}
+{"projectId": "<edit>", "itemId": "<camera item>", "from": 0, "everySeconds": 0.5,
+ "faceCrop": {}, "columns": 6, "rows": 4, "tileSize": 256}
 ```
 
-- One call returns up to 48 tiles: two 6x4 sheets, 12 s each. The next call starts at `from: 24`.
-- Each tile is labelled `#index m:ss.s fFRAME`. Sheets are saved in the app cache (`outputDirectory` in the result); pass `saveToProject: true` to keep them in the scratch project.
-- A 24 s block rendered in 15 to 40 s in testing (`renderSeconds` in the result).
-- Zoom sheet: `times` with the doubtful tiles and the quarter steps around them, `tileWidth: 400`, `columns: 4`, `maxTilesPerSheet: 16`, `detail: "full"`.
+- One call returns up to 48 tiles as two 6x4 sheets (12 s each), plus a JSON index `{sheets: [{start, end, tiles: [{t, row, col, face}]}]}`. When the clip is longer, the result has `next`: call again with that `from`.
+- `faceCrop` crops a square of `scale` (default 1.25) times the median face size, centred on the face in each frame, so the crop follows a moving speaker. `follow: false` keeps one fixed crop on the median face. Tiles where no face was found use the median position and carry a `NO FACE` badge (`face: false` in the index): usually `away`.
+- `crop: {x, y, width, height}` (source pixels, or all four as 0 to 1 fractions) gives a fixed crop instead. Use one or the other.
+- Each tile is labelled `#index m:ss.s fFRAME` (frame at the source frame rate). Sheets and `index.json` are saved beside the project (`.agent-generated/media-sheets`), the recording (`.agent/media-sheets`) or the app cache; the paths are in the result.
+- Frames come straight from the file with the bundled FFmpeg, so it is free, offline and needs no scratch project. 48 face-cropped tiles took about 25 s in testing (`renderSeconds`), most of it face detection.
+- Zoom sheet: `times` with the doubtful tiles and the quarter steps around them, `faceCrop: {scale: 1.1}`, `tileSize: 480`, `columns: 3`.
+
+## 4. Without a face crop
+
+To see the whole frame (a hand over the face, the speaker leaving the frame), call `get_media_contact_sheet` without `crop` or `faceCrop`, or `extract_video_frames` for a few full-size frames.
 
 ## 5. Word timings
 
@@ -63,7 +59,7 @@ If the camera is only a small picture-in-picture inside a screen recording (a st
 
 The canvas of a landscape project renders at 1920x1080, so CSS pixel sizes map 1:1. Headlines of 110 to 150 px read well at full screen; 60 px body text.
 
-Gotcha seen in the demo: small static elements with no CSS `animation` (a corner tag, a label pill) did not show in rendered frames. Give every visible element an entrance animation (`animation: up .4s ease-out both`) and check one frame per card before export.
+Give every text element an explicit `color`. Before the fix of Nov 2026, text with no colour took the app theme's colour, so in dark mode it rendered light grey (nearly invisible on a white card) in previews and sheets; it now defaults to black. Check one frame per card before export.
 
 Optional, and useful when showing the method: a small corner tag on each card ("covered: looking at the screen") and a small "camera look" pill (`width: 22`, `height: 9`, `x: 85`, `y: 9.5`) on every stretch of face time between windows.
 
@@ -89,8 +85,7 @@ A vertical 1080x1920 project that shows the original and the edit in sync, so a 
 
 Verify with one `get_timeline_contact_sheet` at the same times as step 7: top shows the look-away and its tag, bottom shows the card; at lens looks both halves show the face.
 
-## Tool gaps (Nov 2026)
+## Tool notes (Nov 2026)
 
-- `extract_video_frames` returns full frames only (at most 8 per call, no crop, no tiling). A `crop` (`{x, y, width, height}` in source pixels or fractions) and a `contactSheet` option (`everySeconds`, `columns`, `tileSize`, time stamps) would make this skill one call per 24 s with no scratch project.
-- `get_recording_contact_sheet` tiles webcam frames every 0.5 s, but only inside the Recorder assistant and without a crop. Allowing it for external MCP clients with a `projectId`, plus a `crop` parameter, would also work.
-- There is no face box finder. The skill reads the face position by eye from a few frames; a `detect_faces` tool returning boxes per time would let the crop follow a moving speaker.
+- `get_media_contact_sheet`, `detect_faces` and the external-agent access to the recording frame tools were added for this skill (issue #298), replacing the earlier square scratch project plus `get_timeline_contact_sheet` workaround.
+- Face detection finds faces only. Gaze is still judged by eye on the sheets (labelling.md).

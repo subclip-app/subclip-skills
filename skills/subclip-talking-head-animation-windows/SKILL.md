@@ -9,7 +9,7 @@ A speaker who reads a script off a screen looks away from the lens for long stre
 
 You do not need frame-exact gaze tracking. Each window lasts 2 to 5 s, so a decision every 0.5 s is enough. You look at face-cropped contact sheets and label each tile; fixed rules turn the labels into windows.
 
-Method origin: proSamik/Subclip issue #298 (Nov 2026). Automatic gaze tracking (MediaPipe) scored 2/10 on a take where the speaker faced the screen most of the time, because its auto calibration learned the screen pose as "camera". Face contact sheets labelled by an agent scored 10/10 and 8/10 on blind checks. This skill is the same method built only from Subclip MCP tools, with no Python and no extra models.
+Method origin: proSamik/Subclip issue #298 (Nov 2026). Automatic gaze tracking (MediaPipe) scored 2/10 on a take where the speaker faced the screen most of the time, because its auto calibration learned the screen pose as "camera". Face contact sheets labelled by an agent scored 10/10 and 8/10 on blind checks. This skill is the same method built only from Subclip MCP tools, with no Python: `get_media_contact_sheet` makes the face sheets in one call per 24 s, with Subclip's bundled offline face detector.
 
 Read these before you start:
 - [references/labelling.md](references/labelling.md): how to label tiles (camera, screen, away, unclear), with examples.
@@ -23,16 +23,16 @@ Read these before you start:
 - When unsure, the face stays visible. `unclear` tiles count as camera unless both neighbours are look-aways.
 - Never mute, cut or move the voice. Overlays sit above the camera; the audio item is not touched.
 - Every call passes `projectId`. Send mutations one at a time, never in parallel.
-- The face-crop sheets are made in a separate scratch project, so the real edit is never zoomed by mistake.
+- The face sheets come from the source file (`get_media_contact_sheet`), never from the edit, so the real edit is never zoomed or changed.
 - Spend no AI credits: frames, sheets and local Whisper transcription are free and offline.
 
 ## Workflow
 
-1. **Find the camera source.** For a Subclip recording, `list_recordings` gives the id; the camera file is `<Projects folder>/<recordingId>.subclip/webcam.mp4` and the voice is `microphone.m4a` next to it (the webcam file usually has no audio). In an editor project, read the media lane (`read_project_section` with `lane: "media"`) and take the talking-head item's source path. Use the camera track, never `screen.mp4`.
-2. **Locate the face.** `extract_video_frames` on that file at 4 to 8 times spread over the clip, `maxDimension: 480`. Estimate the face centre `(fx, fy)` as fractions of the frame width and height, and the face height `hf` (hairline to chin) as a fraction of the frame height. Use the median over the frames.
-3. **Build the face-crop scratch project.** `create_project` (`canvasPreset: "square"`, name `<project> face sheets`), `import_external_media` with the camera file, then `update_media_item` with `fitMode: "cover"`, `sourceZoom: Z`, `focusX: fx`, `focusY: fy`, `muted: true`, where `Z = 1 / (1.25 * hf)` for a landscape source (clamp 1 to 4). Check with a 4-tile `get_timeline_contact_sheet`: the face should fill most of the tile with both eyes large and in the upper half. Adjust `focusY` or `Z` and check again.
-4. **Make the sheets.** `get_timeline_contact_sheet` on the scratch project: `from`, `to`, `every: 0.5`, `columns: 6`, `maxTilesPerSheet: 24`, `tileWidth: 256`, `detail: "balanced"`, `count: 48`. One call covers 24 s (two sheets of 6x4 tiles, 12 s each). Repeat for each 24 s block. Each tile shows `#index m:ss.s fFRAME`.
-5. **Calibrate, then label.** Skim all sheets first. Find the lens look and the screen direction, write both down, then label every tile (see labelling.md). For unclear tiles, render a zoom sheet: `times` with the tile and the quarter steps around it, `tileWidth: 480`, `detail: "full"`.
+1. **Find the camera source.** The sheet tools take one of three targets. A Subclip recording: `recordingId` from `list_recordings` plus `track: "webcam"` (times are recording seconds; the voice is `microphone.m4a` beside the webcam file, which usually has no audio). A clip already in an edit: `itemId` of the talking-head item from `read_project_section` (`lane: "media"`); times are then timeline seconds, so sheet times equal edit times. Any other file: `source` with its path. Use the camera track, never the screen track.
+2. **Check the face.** `detect_faces` on the same target (default 8 samples). `framesWithFace` should be close to `framesSampled`; `medianFace` is where the speaker sits. If no face is found (very small face, dark room, a stream layout with a tiny face cam), use a manual `crop` in step 3 instead of `faceCrop`.
+3. **Make the face sheets.** `get_media_contact_sheet` with the camera target, `everySeconds: 0.5`, `faceCrop: {}` (square crop of 1.25x the face, centred on the face in every frame), `columns: 6`, `rows: 4`, `tileSize: 256`. One call returns 48 tiles (two sheets of 6x4, 12 s each) plus an index of every tile's time, row and column; call again with `from` set to the returned `next` time for the next 24 s. Each tile shows `#index m:ss.s fFRAME`; a `NO FACE` badge means that tile used the median face position.
+4. **Calibrate.** Skim all sheets first. Find the lens look and the screen direction and write both down (labelling.md, section 1).
+5. **Label.** Label every tile (labelling.md). For unclear tiles, make a zoom sheet: `get_media_contact_sheet` with `times` set to the tile and the quarter steps around it, `faceCrop: {scale: 1.1}`, `tileSize: 480`, `columns: 3`.
 6. **Get word timings.** In the edit project, `transcribe_project` (`mode: "local"`, on the voice item, `highlight: "none"`) if it has no captions, then `get_script` with `pauseSeconds: 0.2`. Hide the captions afterwards if the edit should not show them.
 7. **Compute the windows** with window-rules.md. Write `windows.json` (plain list, seconds, two decimals) and a table of start, end, length and reason, plus the total covered.
 8. **Place the overlays** in the edit project, one call at a time: for each window `add_html_motion_graphic` with `startTime: start`, `duration: end - start`, `width: 100`, `height: 100`, `x: 50`, `y: 50`, an opaque background and its own content. Or use a template (`list_motion_graphics_templates`), a HyperFrames layer, or B-roll (`import_external_media`, `search_public_media`) trimmed to the window. In a chain of windows, give each window new content (a new card, number or screenshot) so the screen never sits still.
@@ -55,9 +55,8 @@ Everything outside the windows is face time: put the on-camera beats (hook, punc
 ## Known failure cases
 
 - **Slightly raised irises versus a lens look.** When the screen sits just above the lens, reading and a lens look differ only by a thin line of white below the iris. This caused every miss in testing. Zoom whenever a frontal face is involved.
-- **Small faces and low light.** A loose crop (1.6x the face) made the eyes too small to judge and failed the test (6/10). Keep the crop at about 1.25x the face. If the speaker sits far back, raise `Z`.
-- **Fast tiles are soft.** `detail: "fast"` renders at tile size and blurs the irises. Use `"balanced"` for the sheets and `"full"` for zoom checks.
-- **Head moves out of the fixed crop.** The scratch crop does not follow the face. If the speaker leans far, the face leaves the tile: label those tiles from a full frame (`extract_video_frames`), usually `away`.
+- **Small faces and low light.** A loose crop (1.6x the face) made the eyes too small to judge and failed the test (6/10). Keep `faceCrop` at its default 1.25x, or lower `scale` to 1.1 when the eyes are still small. Raise `tileSize` for zoom checks.
+- **No face found.** Tiles with a `NO FACE` badge (hand over the face, profile turn, out of frame) are cropped at the median face position; they are usually `away`. If most tiles have the badge, the detector cannot see this face: use a manual `crop` around the face cam and label from that.
 - **Clip ends.** A look-away under 1 s at the very start or end is dropped as a blip. Trim it in the edit instead.
 - **Takes with almost no lens looks** become one long chain. That is correct; the edit then needs a lot of animation, or a re-record.
 - **Several faces.** The crop follows one face only. Do not use this skill on interviews or panels.
