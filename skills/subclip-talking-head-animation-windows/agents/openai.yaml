@@ -1,0 +1,6 @@
+interface:
+  display_name: "Subclip Talking-Head Animation Windows"
+  short_description: "Cover look-aways in talking-head videos with 2 to 5 s full-screen cards"
+  default_prompt: "Use $subclip-talking-head-animation-windows to find where I look away from the camera and cover those moments with full-screen motion cards."
+policy:
+  allow_implicit_invocation: true
