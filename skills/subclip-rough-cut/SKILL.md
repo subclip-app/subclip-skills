@@ -26,3 +26,7 @@ Produce an editable first assembly, not a polished social edit. Read [references
 7. Update the director brief with ordered sources, transcription mode, removed ranges/count, and uncertain fillers deliberately retained for review.
 
 Favor a slightly human pause over an over-cut, robotic sentence. When confidence is low, leave the interval and identify it for manual review.
+
+## After the rough cut
+
+A rough cut removes what is wrong; it does not choose the story. When the creator wants a finished video, continue with `subclip-story-edit` (take log with last take wins, paper edit before reordering), then `subclip-pacing` and `subclip-sound-mix`. Check pause lengths and dead air with `get_pacing_analysis` (if it is not available in this app version, use `analyze_timeline` and the waveform pass above), and score the result with `subclip-self-critique`.

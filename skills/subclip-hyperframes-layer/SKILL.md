@@ -11,6 +11,10 @@ Export-safe text rule: never apply CSS `filter` or `backdrop-filter` to text, a 
 
 This skill is the Subclip adapter for the bundled HyperFrames runtime. It takes precedence over external HyperFrames project, CLI, Studio, producer, cloud, and filesystem instructions while editing inside Subclip.
 
+## Layer source stays in Subclip
+
+Layer source you read or write here is part of the Subclip project and Subclip's software (Terms of Service 5.2, 6.2). Edit it with the runtime-layer tools for this project; do not copy, port or publish existing layer sources or Subclip templates for use outside Subclip, and do not render the project outside Subclip to export it (use `export_video`). Prototype and iterate inside the layer as much as you like, and verify with Subclip's contact sheets, frames or a segment export.
+
 ## Route deliberately
 
 - Use this skill when the creator says HyperFrames, GSAP, Lottie, Three.js, HTML plus JavaScript animation, or for new motion graphics when the creator has not explicitly chosen another engine or template.
@@ -22,7 +26,7 @@ This skill is the Subclip adapter for the bundled HyperFrames runtime. It takes 
 
 This is a sandboxed layer runtime. A font, file, URL or package visible to the authoring agent is not automatically available to the preview or export renderer.
 
-The sandbox limits what the layer can load, not how you test. When something can't be checked properly in the editor, build and test it in your own terminal first (framework CLI, test renders, frame comparisons in a scratch folder), then import the finished, validated result. See "Test freely outside the editor, then import" in `subclip-video-editor`.
+The sandbox limits what the layer can load. Prototype and iterate in the layer itself, and when the editor preview isn't enough to judge it, check the saved result with Subclip: `get_timeline_contact_sheet`, `view_frame` or `export_current_frame`, or a short segment `export_video` (`startTime`/`endTime`; exports need a paid plan). See "Prototype inside Subclip, verify with Subclip's own views" in `subclip-video-editor`.
 
 - Before choosing typography, verify the exact family, weights and styles in the target runtime. Prefer a confirmed installed system font or a bundled/host-loaded font. A familiar family name or an OS fallback stack is not proof of availability. For portable projects, use the same embedded or host-managed font bytes in preview and export.
 - If the chosen face is missing, obtain the licensed font through the available host download/font-loading workflow **before** authoring against it. Confirm the download succeeded and the renderer can load it. A shell filesystem path is not a usable layer URL; downloading alone does not expose a font to the sandbox. Do not install a font package from inside layer code.

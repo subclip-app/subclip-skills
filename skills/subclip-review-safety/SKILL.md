@@ -16,3 +16,7 @@ description: Review, verify, undo, redo, and safely recover Subclip video edits 
 Treat successful tool output as necessary but not sufficient. `get_runtime_layer` returns source, not pixels, and must never be described as frame review. Never claim completion without rendered-frame evidence after the final mutation. A cancelled correction means the edit is unverified, not completed. Never delete projects, export, or consume cloud credits during review without permission.
 
 Use `seek_timeline` with `projectId` before `view_current_frame` with that same `projectId` when checking exact beginning, middle, and ending moments. Do not emulate a seek through raw state paths or terminal commands.
+
+## Score before you report
+
+Checking for defects is the floor, not the finish. After a multi-step edit, follow `subclip-self-critique`: `review_segment` for each range, look at the sheet and the numbers, `record_segment_review` with honest scores, fix everything under 7, and confirm `list_segment_reviews` shows full coverage with nothing stale before reporting or exporting. If those tools are not available in this app version, review each range with `get_timeline_contact_sheet` and `get_audio_timeline_sheet` and write the scores into the director brief.

@@ -1,11 +1,11 @@
 ---
 name: subclip-3d-mockup
-description: Create, inspect, clone, style, retime, animate, and deliver native editable 3D device layers in Subclip using approved models and semantic MCP tools.
+description: Create, inspect, clone, style, retime, animate, and deliver native editable 3D layers in Subclip, from approved device models or imported Blender/glTF .glb files (with embedded clips and cameras), using semantic MCP tools.
 ---
 
 # Subclip 3D mockups
 
-Use this skill for bundled phone, laptop, tablet, watch, device-screen, product-turntable, camera, and 3D keyframe requests. Native 3D belongs in the dedicated 3D panel and 3D timeline track, never inside Motion Graphics, HyperFrames, or Remotion.
+Use this skill for bundled phone, laptop, tablet, watch, device-screen, product-turntable, camera, 3D keyframe, and imported `.glb` (Blender export) requests. Native 3D belongs in the dedicated 3D panel and the "3D" timeline track, never inside Motion Graphics, HyperFrames, or Remotion. Every 3D layer, bundled or imported, renders inside Subclip with WebGL in the preview and in export; deliver with `export_video` and never re-render a GLB scene with other tools.
 
 For every custom 3D keyframe request, immediately load `references/keyframes.md` through `read_subclip_skill` before writing animation. The reference defines the complete MCP lifecycle and is mandatory even when the requested motion appears simple.
 
@@ -97,6 +97,39 @@ Interpret axes precisely. `modelRotationDegrees` is `[x, y, z]`. A Z-axis rotati
 - `replacementStrategy: "fitted-overlay"` means Subclip safely handles a texture-atlas model through reviewed overlay geometry. Use the same semantic screen tools; never compensate with model transforms or try to write overlay coordinates.
 - `hasCameraCutout: true` means the registry preserves a physical punch-hole while media fills the surrounding display. Do not add padding solely to protect that camera.
 
+## Imported GLB models (Blender and other glTF 2.0 exports)
+
+Use this path when the creator supplies a `.glb`, or asks for a model that `list_3d_models` does not have. People can also click **Import GLB** (or drop a `.glb`) in the 3D Studio panel; both paths run the same validation, import, and auto-framing.
+
+1. Optionally call `inspect_3d_glb` with `path` to validate and read clips, cameras, mesh count, and bounds without importing.
+2. Call `add_glb_3d_layer` with the absolute `path` (or `existingModelPath` to reuse a GLB already in the project). It copies the file into the project package, creates a `modelId: "custom-glb"` layer on the same 3D track as the device models, and auto-frames it: centred at the origin, longest side 2 units, camera fitted to the 16:9 viewport. Positions, scales and camera values for imported layers are in these normalized units.
+3. Read `glb.clips` and `glb.cameras` from the result (also in `get_3d_layer` and `inspect_3d_glb` with `itemId`). Use only returned names or indexes.
+4. Check the framing with `view_current_frame` (`targetType: "3d"`, the `itemId`) at the start, a midpoint, and the end; adjust with `update_3d_layer` or keyframes.
+
+Refusals and limits: only glTF 2.0 binary; at most 200 MB; everything embedded (a `.gltf` with separate `.bin`/textures, or any external URI, is refused); required extensions must be supported (Draco and meshopt compression, KHR_mesh_quantization, KHR_texture_transform, KHR_materials_* and EXT_texture_webp work; KTX2/Basis textures are refused). Imported layers have no device screens: `set_3d_screen_content`, `set_3d_screen_appearance`, and `clear_3d_screen_content` refuse them, and the 3D panel hides screen options. Rotate/move/scale, Subclip camera, keyframes, lighting, scene background, and every animation preset (they only move the model or camera) work as for devices. `update_3d_layer` cannot set `modelId: "custom-glb"`; swapping an imported layer to a bundled device drops the GLB.
+
+### Embedded animation clips
+
+- `animation: "auto"` (default) plays the only clip, or every clip together when there are several. `{ "clipName": "Walk" }` plays one clip; `{ "mode": "all" }` plays all clips on one shared clock (shorter clips hold their last pose). Optional `sourceStartSeconds`/`sourceEndSeconds` (clip seconds), `playbackRate`, `loop` (default true). `"none"` shows the rest pose.
+- Change it later with `update_3d_layer` `glbAnimation` (`"none"` stops it).
+- Clips are sampled from the timeline frame (never wall-clock time), so preview, frame capture, and export show the same pose for the same frame. Clip playback is independent of Subclip model/camera keyframes, which still apply on top.
+
+### Embedded cameras and storyboard cuts
+
+- `glbCameraSource` (`update_3d_layer`) or `cameraSource` (`add_glb_3d_layer`): `"subclip"` (default, keyframable Subclip camera) or a GLB camera name/index from `glb.cameras`. A GLB camera's animated transform and field of view drive the view; aspect follows the layer frame. It ignores Subclip's model transform, so model keyframes still move the model inside the shot.
+- `glbCameraCuts` / `cameraCuts`: `[{ "time": 0, "camera": "CamWide" }, { "time": 2.5, "camera": "CamClose" }, { "time": 5, "camera": "subclip" }]`. Times are seconds from the layer start; the latest cut at or before a frame wins; the list is replaced on every update (`[]` clears it). Cut references are stored by camera name.
+- Lights: a GLB's own KHR_lights_punctual lights (`glb.lights`) are ignored by default, so colours stay close to the Blender base colours under Subclip's lighting preset. `useEmbeddedLights: true` (`add_glb_3d_layer` or `update_3d_layer`) renders them instead of the preset's key and fill lights, converting Blender's photometric units (sun lux, point/spot candela) back to three.js intensities.
+- While a GLB camera is active, Subclip camera values and camera keyframes are ignored; tool results include `cameraNote` and the 3D panel shows a notice. A camera only moves when its animation plays: with one selected clip, the camera's own action must be that clip, so prefer `mode: "all"` for storyboard scenes.
+
+### Blender export checklist (tell the creator when a file is refused or looks wrong)
+
+- File > Export > glTF 2.0, Format **glTF Binary (.glb)**; include selected objects or the whole scene, and enable **Cameras** when shots should come from Blender.
+- Apply modifiers (Geometry > Apply Modifiers). Bake procedural/node materials to image textures; glTF carries Principled BSDF PBR only. Keep textures at 2K or smaller and use JPEG/PNG/WebP, not KTX2.
+- Animation: enable Animation; use Mode **Scene** or merged NLA strips so every object's action exports; enable **Sampling / Bake animation** (and "Always sample") for constraints, drivers, rigs, physics, and follow-path cameras.
+- Blender timeline markers that bind cameras do **not** export to glTF. Recreate the shot switches with `cameraCuts`.
+- Optional: Compression (Draco) for heavy meshes. Keep the file under 200 MB.
+- Animated camera focal length exports only through KHR_animation_pointer, which Subclip does not play yet; the camera's transform animation and its static field of view are used.
+
 ## Reviewed recent models
 
 | Model ID | Screen behavior | Agent usage |
@@ -106,6 +139,7 @@ Interpret axes precisely. `modelRotationDegrees` is `[x, y, z]`. A Z-axis rotati
 | `macbook-air-m2` | Registry-managed fitted full-screen landscape overlay | Bind landscape media to `primary-screen`; the model's physical notch renders above media automatically, so no synthetic cutout is used. |
 | `macbook-air-15-2023` | Direct isolated display mesh with native notch geometry | Bind landscape media to `primary-screen`; no manual orientation or notch correction is needed. |
 | `samsung-galaxy-s26-black` | Registry-managed portrait overlay with camera cutout | Prefer portrait media with `cover`; use `contain` only when preserving every source edge is intentional. |
+| `iphone-duo-fold-night-sky`, `iphone-duo-fold-star-white` | Two direct displays on the unfolded Duo Fold: `inner-screen` (large landscape-ish inner display, faces the camera) and `cover-screen` (portrait cover display on the back) | Bind each slot independently with `set_3d_screen_content`. Foldable: `deviceView` (`add_3d_layer`/`update_3d_layer`) picks the screenshot tool's views: `inner` (open, inner display), `cover` (open, from the back), `half-fold` (25% fold, turned 17°), `cover-half-fold`, `closed` (cover display faces the camera, centred). `foldAmount` (0 open .. 1 closed) sets the fold; keyframe it with `foldAmount` on `set_3d_keyframe_sequence`/`create_3d_keyframe`/`update_3d_keyframe` to animate opening and closing. |
 
 ## Scene backgrounds and lighting
 
@@ -119,8 +153,8 @@ Interpret axes precisely. `modelRotationDegrees` is `[x, y, z]`. A Z-axis rotati
 
 ## Tool coverage
 
-- Discovery and inspection: `list_3d_models`, `list_3d_animation_presets`, `inspect_3d_composition`, `get_3d_layer`, `list_editor_assets`.
-- Layer lifecycle: `add_3d_layer`, `clone_3d_layer`, `update_3d_layer`, `split_timeline_item`, `delete_timeline_item`.
+- Discovery and inspection: `list_3d_models`, `list_3d_animation_presets`, `inspect_3d_composition`, `get_3d_layer`, `inspect_3d_glb`, `list_editor_assets`.
+- Layer lifecycle: `add_3d_layer`, `add_glb_3d_layer`, `clone_3d_layer`, `update_3d_layer` (including `glbAnimation`, `glbCameraSource`, `glbCameraCuts`, `useEmbeddedLights`, `deviceView`, `foldAmount`), `split_timeline_item`, `delete_timeline_item`.
 - Screen content and styling: `set_3d_screen_content`, `set_3d_screen_appearance`, `clear_3d_screen_content`.
 - Animation inspection: `list_3d_keyframes`, `get_3d_layer`, `inspect_3d_composition`, `verify_3d_layer_setup`.
 - Animation editing: `set_3d_keyframe_sequence`, `create_3d_keyframe`, `update_3d_keyframe`, `duplicate_3d_keyframe`, `delete_3d_keyframe`, `clear_3d_keyframes`, `append_3d_animation_preset`, `apply_3d_animation_preset`.
@@ -130,7 +164,7 @@ Interpret axes precisely. `modelRotationDegrees` is `[x, y, z]`. A Z-axis rotati
 
 ## Verification checklist
 
-- `get_3d_layer.modelId` exactly matches the requested model.
+- `get_3d_layer.modelId` exactly matches the requested model (`custom-glb` for an imported GLB, with the expected `glb.animation`, `glb.cameraSource`, and `glb.cameraCuts`).
 - Every requested semantic screen slot exists and is bound to the intended tool-returned project file ID.
 - The intended 3D item is active at the inspected playhead.
 - Screen media is not mirrored, upside down, missing, or replaced by the GLB's original wallpaper.

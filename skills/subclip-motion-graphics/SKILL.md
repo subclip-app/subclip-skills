@@ -33,7 +33,7 @@ For HTML/HyperFrames motion, never put CSS `filter`/`backdrop-filter` on text or
 
 ## Resource availability and native media
 
-All three engines run inside Subclip's sandbox. Confirm fonts, asset bytes and permitted dependencies are available to preview **and** export before using them. Prefer confirmed installed/bundled/host-loaded font faces. If a font or foreign resource is absent, download/import it through supported host tools and verify it loads; if that fails, use a verified alternative and disclose the substitution. An agent filesystem path or a successful network request outside the renderer is not proof of sandbox access. You may still build, render and compare in your own terminal before importing; see `subclip-video-editor` → "Test freely outside the editor, then import".
+All three engines run inside Subclip's sandbox. Confirm fonts, asset bytes and permitted dependencies are available to preview **and** export before using them. Prefer confirmed installed/bundled/host-loaded font faces. If a font or foreign resource is absent, download/import it through supported host tools and verify it loads; if that fails, use a verified alternative and disclose the substitution. An agent filesystem path or a successful network request outside the renderer is not proof of sandbox access. Prototype in the layer and check the saved result with `get_timeline_contact_sheet`, `view_frame` or a short segment export; see `subclip-video-editor` → "Prototype inside Subclip, verify with Subclip's own views".
 
 Import images/videos into the project Media library and sounds into the Audio library first; re-list assets and use only the returned URLs where the engine supports them. Prefer native MediaLayer/AudioLayer items and their editable lanes, with motion items providing the graphics. Embedded media is an exception for an effect inseparable from the component, not a default place for the whole edit or soundtrack. Inspect existing source/bindings and move separable content to native lanes, preserving timing/trim/crop/volume and avoiding duplicate playback.
 
@@ -97,6 +97,14 @@ MediaPanel does not register standalone `.svg` files. When the creator supplies 
 11. If this was created from an untitled project, verify that the first-step title remains saved. Re-list or re-read the project and only report that title when saved state contains it. Do not rename an existing creator-authored project.
 
 If live frame capture fails, keep the Motion-panel items saved and report visual verification as unavailable. Never claim the motion graphic exists when `motionItems` is empty, and never claim a text-only fallback satisfies a motion-graphics request unless the user accepts that fallback.
+
+## On-screen time and taste
+
+A graphic that stays after its line is over is the most common motion-graphics fault. After adding or changing graphics:
+
+- Call `get_pacing_analysis` and read `textItems`: fix every `too-long` and `too-short` (end at `suggestedEnd`, shorten the hold and keep the exit). If it is not available in this app version, use 0.5 s plus 0.3 s per word as the minimum and about twice that as the maximum. Rules in `subclip-pacing`.
+- Call `lint_text_style` and clear every finding (long dashes, dot separators between words, ellipsis glyph, sparkle emoji, title case sentences, stock AI phrases). If it is not available in this app version, check the strings by hand. Rules and the ban list of generic looks are in `subclip-taste`.
+- Look at each graphic on its own with `get_item_contact_sheet` (entrance, hold, exit); if it is not available in this app version, use `get_timeline_contact_sheet` with `times` inside the item.
 
 ## Media that will not load
 

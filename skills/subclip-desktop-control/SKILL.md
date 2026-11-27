@@ -8,6 +8,7 @@ These tools act on the creator's real computer. Work carefully, check each step 
 
 ## Before anything else
 
+0. Headless Subclip (`get_sign_in_status` → `device.headless: true`) has no screen: none of these tools can work and `request_approval` fails. Tell the creator, ask in chat for anything you would have asked through an approval, and do the work without desktop actions. See `subclip-video-editor` → `references/headless.md`.
 1. Call `agent_status`. If `stopped` is true, stop and tell the creator: only they can resume agents, from the Subclip menu bar.
 2. Read `permissions`. A tool is only offered when its permission is on:
    - Screen Recording: `take_screenshot`, `pick_screenshot_area`, `pick_recording_area`, `start_recording`, `capture_window`.

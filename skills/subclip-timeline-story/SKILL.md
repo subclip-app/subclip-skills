@@ -42,3 +42,9 @@ Treat a reference as evidence, not a template to copy mechanically. Infer which 
 For several incompatible originals, enqueue each conversion once and store the distinct job IDs. Subclip serializes the work to keep the editor responsive and resumes the agent for each terminal event. Do not block on or repeatedly invoke a long synchronous transcode. Cancel obsolete jobs with `cancel_media_import` before changing the cut plan.
 
 Prefer reversible, small edit batches. Do not silently ripple unrelated tracks. Keep dialogue captions synchronized with their source speech. Use undo or project history when an operation produces an inconsistent timeline.
+
+## Story, pacing and critique
+
+- Starting from raw footage or an unclear structure: read `subclip-story-edit` and write the paper edit (hook, setup, beats, payoff, call to action, with timecodes) before the first cut.
+- Rhythm is measured, not guessed: `get_pacing_analysis` for shot lengths, cuts on the beat, text on-screen time, hook timings and dead air (if it is not available in this app version, use `analyze_timeline` scenes); targets and fixes are in `subclip-pacing`. Beats come from `get_audio_analysis` `music.tracks` (older app: tempo from the creator or the music prompt).
+- After restructuring, score each changed segment with `subclip-self-critique` before reporting.

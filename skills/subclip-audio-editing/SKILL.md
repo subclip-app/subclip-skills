@@ -20,6 +20,7 @@ Mixing defaults:
 - Background music under speech: start around 0.15–0.30 and adjust by context.
 - Use short fades at abrupt music boundaries.
 - Do not loop voice or sound effects unless explicitly requested.
+- These volumes are starting points. Mix to measured targets with `subclip-sound-mix`: call `get_audio_analysis` after every audio change (if it is not available in this app version, use `get_audio_timeline_sheet`'s summary), keep music 12 to 18 dB under the voice while someone speaks, no `masked` speech segment, true peak at or under -1 dBTP, and place effects from a cue sheet on the visual events.
 
 To create a new sound effect (whoosh, hit, riser, UI sound, foley, ambience) rather than reuse an existing file, read `subclip-music-generation` and call `generate_music` with `modelId: "elevenlabs-sound-effects"`; it imports as an ordinary Audio asset.
 - When extracted narration is the master track, call `set_all_video_audio` with `muted: true` so incidental source audio cannot double the voice.

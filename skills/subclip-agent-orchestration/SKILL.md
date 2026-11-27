@@ -32,7 +32,8 @@ Shared decisions (style, palette, voice, durations, aspect ratio) are made by yo
 
 ## 3. Where they work
 
-- Parts that touch the same timeline at the same moment must not run in parallel on one project. Give each such part its own sub-project: `create_project` (same canvas), name it "<film> - <part>", put it in the same workspace.
+- Same-timeline option: when the cut is locked and sections of one existing timeline each need work, agents can share the project by claiming ranges (`plan_timeline_segments`, `claim_timeline_segment`, `claimId` on every edit, `release_timeline_segment`). Read `subclip-multi-agent-timeline` first. If those tools are not available in this app version, use sub-projects as below.
+- Without claims, parts that touch the same timeline at the same moment must not run in parallel on one project. Give each such part its own sub-project: `create_project` (same canvas), name it "<film> - <part>", put it in the same workspace.
 - Parts that only generate (images, clips, music) can work on the main project, because generation does not edit the timeline until import; tell them to import only into their own time ranges, or to return operation ids and let you import.
 
 ## 4. Start, follow, fix
@@ -45,5 +46,5 @@ Shared decisions (style, palette, voice, durations, aspect ratio) are made by yo
 ## 5. Merge and finish
 
 1. `merge_project_timeline` each sub-project into the main project at the right `startTime` (it keeps relative timing; captions are not copied).
-2. Review the whole film with `get_timeline_contact_sheet`, fix overlaps, then caption it (one `transcribe_project` per narration item).
+2. Review the whole film with `get_timeline_contact_sheet`, fix overlaps, then caption it (one `transcribe_project` per narration item). Score every segment with `subclip-self-critique` (`review_segment`, `record_segment_review`; if they are not available in this app version, review by contact sheet and audio sheet) and rebuild what is under 7.
 3. Tell the creator which sessions ran, where their chats are, what each made, and the credits spent (`get_ai_credit_status`).

@@ -26,7 +26,7 @@
 - `generate_dubbing_segments`: generate up to 12 translated utterances per bounded paid batch and resume the in-app assistant once the aggregate batch is terminal
 - `commit_dubbing_workspace`, `discard_dubbing_workspace`: atomically import reviewed segment audio before optional source muting, or clean an abandoned uncommitted workflow
 - `list_editor_assets`: concise canvas, playhead, media, audio, text, Motion, HyperFrames, Remotion, native 3D, and Elements inventory; framework source is represented by hash/byte count until requested explicitly
-- `list_3d_models`, `list_3d_animation_presets`, `inspect_3d_composition`, `get_3d_layer`: approved model/animation discovery and exact native 3D state inspection
+- `list_3d_models`, `list_3d_animation_presets`, `inspect_3d_composition`, `get_3d_layer`, `inspect_3d_glb`: approved model/animation discovery, imported GLB clips/cameras, and exact native 3D state inspection
 - `list_canvas_background_presets`: bundled midnight, daytime, landscape, and `colorFlow-1` through `colorFlow-74` image IDs shared by canvas, 3D scene, and device-screen background tools
 - `list_runtime_layer_templates`: built-in HyperFrames and Remotion template IDs, metadata, defaults, and opt-in source
 - `list_motion_graphics_templates`: every Motion Graphics template across Remotion, HyperFrames, and HTML/CSS. Resolve an exact @ catalogId/templateId or search, then invoke returned importTool/importArguments. Source and full defaults are opt-in. Maps include `map-explainer` (Cesium) and `river-sequence` (flat vector).
@@ -66,7 +66,10 @@ Use the dependency already provided by Subclip. If the import is unavailable, ch
 - `list_shared_items` / `update_shared_video` / `update_shared_project` / `delete_shared_item`: manage cloud shared videos and projects (rename, access, emails, downloads, auto-delete; delete needs confirm: true and the user's OK)
 - `edit_screenshot`: edit a picture or fresh capture with no editor window: crop, annotations (arrow, line, rect, ellipse, circle, highlight, text, redact, callout, magnifier), frame (background, padding, roundness, shadow, aspect, device mockup, tilt, watermark); saves to the Screenshot folder
 - `share_video_file`: upload any local video file (not only Subclip exports) and get a Subclip watch link; optional name, defaults to the file name; paid plan required; runs in the background, so poll `get_video_share_status` with the returned jobId and never call it twice for one file
-- `share_project`: share a saved project (or Recorder recording) as a Subclip shared-project link; name, access, allowedEmails, allowDownload; paid plan required; background, poll `get_project_share_status`
+- `share_project`: share a saved project (or Recorder recording) as a Subclip shared-project link; name, access, allowedEmails, allowDownload; paid plan required; background, poll `get_project_share_status`; it is also the push of cloud sync (updates the same link; refused when a newer version was published: pull first)
+- `list_synced_projects`: the user's own shared (cloud) projects and the local projects tracking each, with state (up-to-date, ahead, behind, diverged)
+- `get_sync_status`: one local project's sync state with its shared project and what to do next
+- `pull_project`: `projectId` updates a local project from the latest cloud version (only missing media is copied; undoable); `onConflict` "abort" (default), "theirs" (ask the user first) or "copy"; `sharedProjectId` (or showcase link) without projectId downloads it as a new tracking project
 - `extract_timeline_audio`: audio of media already in the project (item, lane or whole timeline, optional time segment) as a mixdown or per-clip WAV; revealInFinder / addToTimeline options
 - `remove_timeline_audio`: video only; mute (or restore) clips by item, lane, whole timeline or time segment, splitting at the segment edges
 - `set_all_video_audio`: mute/unmute every video item together, especially when an AudioPanel item is the master soundtrack
@@ -89,6 +92,7 @@ Use the dependency already provided by Subclip. If the import is unavailable, ch
 - `set_3d_screen_content`, `set_3d_screen_appearance`, `clear_3d_screen_content`: independently manage device screen media, timing, fit, padding, roundness, and background without unintended resets
 - `list_3d_keyframes`, `set_3d_keyframe_sequence`, `create_3d_keyframe`, `update_3d_keyframe`, `duplicate_3d_keyframe`, `delete_3d_keyframe`, `clear_3d_keyframes`: complete editable model/camera/canvas keyframe lifecycle
 - `append_3d_animation_preset`, `apply_3d_animation_preset`: reviewed preset controls; append preserves existing motion while apply replaces it
+- `add_glb_3d_layer`, `inspect_3d_glb`: import a glTF 2.0 binary (.glb, e.g. a Blender export) as a native 3D layer (`modelId: "custom-glb"`, auto-framed, no device screens), and validate a file or read an imported layer's clips and cameras; it renders inside Subclip and exports with `export_video`. Embedded clip playback, GLB cameras and storyboard camera cuts are set with `update_3d_layer` (`glbAnimation`, `glbCameraSource`, `glbCameraCuts`)
 - `set_canvas_properties`: choose landscape, vertical, or square canvas and optionally set its background
 - `set_project_duration`: set the exact final timeline and canvas-background endpoint; it reports any media, audio, text, motion, or caption items that must be shortened or removed first
 - `split_timeline_item`: split with UnifiedTimeline semantics; caption words owned by a split media or audio clip move to the half they play in
@@ -115,7 +119,11 @@ Use the dependency already provided by Subclip. If the import is unavailable, ch
 - `view_frame`: quick look at 1-8 moments as small JPEGs (default 720 px, rendered at that size, cached while the project is unchanged); use it while iterating, `view_current_frame` for the final full-size check, `skipHyperframes:true` when HyperFrames layers are not the point (on Linux without a GPU a heavy HyperFrames layer is left out automatically and the result says so; pass `skipHyperframes:false` to force it, which can take minutes)
 - `get_app_update_status` (read-only): app version, update phase (idle, checking, downloading, ready, up-to-date, error), percent, available version, `installPending`, and `canInstallNow` with the reason when a recording, export or download is running
 - `check_for_app_update`: start an update check (same as Check for Updates in the menu bar); a newer version downloads by itself and waits for a restart, nothing restarts
-- `install_app_update_and_restart` (destructive, needs `confirm:true`): restart to install a downloaded update; refused when no update is ready or work is running unless `force:true`; relaunches into the menu bar only, MCP is down for a few seconds. Use only when the creator asked for the update
+- `sign_in` (works signed out): device-code sign-in; returns `verificationUriComplete`, `userCode`, `expiresIn`, `interval`, `openedBrowser` (true when it opened this computer's browser; always false headless). Show the link and the code to the human, who approves on subclip.app; then poll `get_sign_in_status`
+- `get_sign_in_status` (read-only, works signed out): signed in or not, the pending code's state, this device (`device.headless` true = no screen), and the local MCP `tokenFingerprint`/`tokenHint`/port (never the token)
+- `sign_out`: `confirm:true`, only when the human asks
+- `open_upgrade_page` (`plan?` monthly|lifetime, `reason?`): only when the creator wants to upgrade or an export/feature said it needs a paid plan; opens subclip.app pricing (when a screen exists) and returns `url`, `openedBrowser`, `hasPaidPlan`. Give the human the link; never act on the checkout page
+- `install_app_update_and_restart` (destructive, needs `confirm:true`): restart to install a downloaded update; refused when no update is ready or work is running unless `force:true`; relaunches into the menu bar only, MCP is down for a few seconds. Use only when the creator asked for the update. Linux .deb/.rpm with nobody to enter a password (headless, locked screen): refused with `refused: "needs-admin"` and `manualInstallCommand`; give the human that command (see references/headless.md)
 - `reset_background_processes`: fix a stuck render without quitting (stops HyperFrames renders, kills leftover render browsers); `restart:true` relaunches Subclip into the menu bar only and is refused while a window is open or a recording or export runs. Never ask the user to quit the app; an MCP client cannot reopen it
 - `restore_native_captions`: undo that conversion: un-hide exactly the words it hid and remove the HyperFrames caption layer
 - `update_media_item`: complete native MediaPanel controls—trim, sound, playback, crop/focus, transform/container, opacity/fades, style/effects, transition type and UI animation speed, composition-plane placement, lane, and z-order
@@ -138,6 +146,7 @@ Relevant state roots are `canvasConfig`, `mediaData`, `audioData`, `subtitleData
 
 - `get_export_configuration`: read available containers/codecs, quality presets, alpha eligibility, and current export defaults before choosing a non-default format
 - `export_video`: after an explicit export request, render MP4/H.264, WebM/VP9, MKV/VP9, or MOV/ProRes 4444 with explicit quality and transparency when needed; omit `startTime`/`endTime` for the complete project, or pass both (inclusive start, exclusive end) plus a meaningful `outputFileName` for one segment; pass `outputDirectory` only for an explicitly requested directory
+- Pre-render finished ranges ahead of the final export (only when the creator asks): `prerender_segments`, `get_prerender_status`, `clear_prerenders`.
 - `get_export_status`: external/status-check fallback for an exact export request; in-app agent runs are resumed on terminal events, and completion includes the saved display path
 - `list_render_queue`: read-only view of the one shared render queue (running, waiting with `queuePosition`, latest finished renders); call it before `export_video` so an export that is already queued or done is not duplicated. All renders share it, one project render at a time; waiting is normal, and the export renders the project as saved when it was requested
 - `cancel_job`: also cancels a queued or running render, pass the `export_video` request ID
@@ -158,6 +167,35 @@ Confirm before paid cloud work when the current request has not already authoriz
 - `set_3d_screen_content`: bind project image/video media to a model screen; use `audioEnabled` and `volume` to keep requested video sound inside the 3D layer without creating a duplicate audio timeline item.
 
 For generative changes to clip content (objects, colors, environment), route to `$subclip-video-generation` and discover `flux-video-edit`. Use ordinary timeline tools for trims/reframes. Talking portraits route to `$subclip-avatar-generation`; Avatar IV needs portrait AND supplied speech audio.
+
+## Perception and critique
+
+New in recent app versions; each line names the fallback for an older app. Skills: `subclip-perception`, `subclip-pacing`, `subclip-sound-mix`, `subclip-taste`, `subclip-self-critique`.
+
+- `get_audio_analysis` (read-only): the mix in numbers for a range (`startTime`, `endTime`, `windowSeconds`, `include`): `mix` loudness and true peak, `lanes`, `speech.segments` with `gapDb` and `masked`, `music.tracks` with `bpm`, `beats`, `downbeats`, `sections`, `sfx` with `cutSync`, `overlap`, `issues`. Older app: `get_audio_timeline_sheet` summary and warnings
+- `get_pacing_analysis` (read-only): `scenes`, `cutsPerMinute`, `shotLength`, `beatSync`, `textItems` with on-screen time verdicts, `captions`, `hook`, `deadAir`, `energy`, `issues`. Older app: `analyze_timeline` scenes plus item times from `read_project_section`
+- `lint_text_style` (read-only): marks that read as AI-made or sloppy in text, captions, elements and layer strings; `findings` with `rule`, `excerpt`, `suggestion`. Older app: check by hand against `subclip-taste`
+- `get_item_contact_sheet` (read-only): one item across its own duration (`itemId`, `count` or `times`, `isolate`). Older app: `get_timeline_contact_sheet` with `times` inside the item
+- `review_segment` (read-only): one bundle for a range: sheet, audio, pacing, text findings, items, `rubric`, `reviewId`. Older app: call the sheet and analysis tools for the range
+- `record_segment_review`: store scores (1 to 10 or null), issues, verdict and summary for a reviewed range; returns `overall`, `belowThreshold`, `nextAction`. Older app: note scores in the director brief
+- `list_segment_reviews` (read-only): latest review per range, `stale`, `coverage`, `unreviewedRanges`, `lowestSegments`. Older app: keep the list in the director brief
+
+## Several agents on one timeline
+
+Skill: `subclip-multi-agent-timeline`. Older app without these tools: one agent per project, sub-projects and `merge_project_timeline`.
+
+- `plan_timeline_segments` (read-only): split the timeline by `count`, `maxSeconds` or given `segments`; returns `segmentId`, `start`, `end`, `label`, `suggestedLaneOffset`, and `coordinatorId` once to the first caller
+- `claim_timeline_segment`: reserve a range and a lane block for one `agentLabel`; returns `claimId`, `laneRange`, `expiresAt`; refused with the holder when it overlaps a live claim
+- `release_timeline_segment`: give a claim back as soon as the work is done
+- `list_timeline_claims` (read-only): holder, range, lanes, expiry, last activity and latest review score per claim
+- While claims are live, pass `claimId` on every mutating call; edits outside the claim are refused, and ripple or global changes need the `coordinatorId`; refusals carry a stable `code`
+
+## Creator style
+
+Skill: `subclip-creator-style`. Older app without these tools: `fetch_linked_media` on the creator's own videos, then measure by hand.
+
+- `learn_creator_style`: background job that studies the creator's own channel or videos (`urls`, `maxVideos`, `confirmOwnContent: true`, `workspaceId` or `workspaceName`); returns `jobId`
+- `get_creator_style_status` (read-only): progress, then `videos` with stats, transcripts and sheets, the aggregate `profile`, `assets` and the workspace files written (`STYLE_STATS.md`)
 
 ## Reporting to the Subclip team
 

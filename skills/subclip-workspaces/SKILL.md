@@ -51,3 +51,7 @@ These are the Motion Graphics gallery (catalog) templates, not the snapshot temp
 ## Skills per workspace
 
 Installed skills can be limited to workspaces with `set_skill_enabled` (`workspaceIds`); only do this when the creator asks. A workspace's `favoriteSkills` (favourites category `skills`) are the installed skills the creator prefers there: use them first when they fit the task. Follow `subclip-skill-gateway` for any installed skill.
+
+## Creator style profile
+
+A workspace can hold the creator's measured style: `STYLE_STATS.md` (written by `learn_creator_style`), `STYLE.md` and `SCRIPT_VOICE.md` (written by the agent), plus Dos and Don'ts. When these files exist, read them before planning any edit in that workspace and match their numbers. To build or refresh the profile from the creator's own channel, follow `subclip-creator-style`; if `learn_creator_style` is not available in this app version, that skill explains how to measure a few of the creator's own videos by hand.

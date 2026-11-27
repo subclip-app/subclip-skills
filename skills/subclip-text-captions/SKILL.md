@@ -86,3 +86,7 @@ Keyframes: use `add_text_keyframe` for animated `tiltX`, `tiltY`, `tiltZ` (-88..
 - Use `add_text_keyframe` on the exact existing item ID and absolute project time to animate tilt and scale. Omitted tilt inherits the previous keyframe or base style; missing base tilt is zero. Keep existing scale unless the user requests a change.
 - Changing base tilt alone will not override explicit tilt keyframes. Update the relevant keyframes instead. Older media keyframes need no recreation merely because they lack tilt fields; the sampler provides defaults.
 - Distinguish saving settings from visually confirming the effect. Do not claim preview/export validation unless it was performed.
+
+## Lint and timing before you finish
+
+After writing or changing text overlays or captions, call `lint_text_style` and fix every finding (if it is not available in this app version, read each string against the text rules in `subclip-taste`: no long dashes, no dot or bullet separators between words, no ellipsis glyph, sentence case, plain short copy). Then check on-screen time with `get_pacing_analysis` `textItems` (older app: 0.5 s plus 0.3 s per word as the minimum) and fix every `too-long` and `too-short`; see `subclip-pacing`.

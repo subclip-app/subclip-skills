@@ -7,6 +7,8 @@ description: Learn the production style of a reference the user supplies (their 
 
 Goal: take the look, pacing and motion of a reference and apply those patterns to new work on the user's own topic. Output is new, original scenes. Study patterns, never copy material.
 
+When the reference is the creator's own channel or back catalogue and the goal is to keep editing in their style, use `subclip-creator-style` instead: `learn_creator_style` measures their videos into a workspace profile that later projects reuse (if it is not available in this app version, continue with the steps below on files they supply). This skill is for a one-off look taken from a reference.
+
 ## Hard limits
 
 - Never import, reuse or re-render frames, footage, logos, captions, music, copy or characters from the reference. Use the reference only to measure patterns.

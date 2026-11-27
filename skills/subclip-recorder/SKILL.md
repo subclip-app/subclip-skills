@@ -4,6 +4,8 @@ description: Edit a saved Subclip Recorder screen recording, including source cl
 ---
 # Subclip Recorder
 
+Headless Subclip (`get_sign_in_status` → `device.headless: true`) cannot record or open the Recorder window: there is no screen. Saved recordings can still be listed, edited and exported with the tools below. Tell the creator to record on a computer with a screen.
+
 Starting a recording (`start_recording`):
 - Always pass `name`: a short title of what is being recorded. Do not leave the default date and time name.
 - Record one window with `windowId` (from `list_app_windows` or `open_app`). The window is recorded even while it is behind the creator's own app, and a hidden app is shown again without being brought to the front.
@@ -21,7 +23,7 @@ Attached image and file snapshots are listed in the agent's trusted request cont
 
 An attached folder is a selective snapshot: caches, build output, and oversized files are skipped and listed with their read-only original paths in the snapshot's `subclip-folder-index.json`. Read only the files the request needs, open a skipped original only when the request depends on it, and never treat a skipped entry as a missing attachment.
 
-Discover schemas with `mcp_editor__list_tools` using `domain: "recorder"` and `includeSchemas: true`. Invoke reads through `mcp_editor__call_read_tool` and edits through `mcp_editor__call_tool`. External MCP clients may expose the named tools directly.
+In a Recorder workspace the everyday tools are in your own tool list: `list_recordings`, `get_recording`, `start_recording`, `stop_recording`, `wait_for_recording`, `edit_recording_clip`, `edit_recording_zoom`, `export_recording` and `export_recording_status`. Call them directly. For any other Recorder tool, find it with `mcp_editor__list_tools` using `domain: "recorder"` (names and descriptions only), then fetch just the schemas you need with `names: [...]`. Invoke those reads through `mcp_editor__call_read_tool` and edits through `mcp_editor__call_tool`. External MCP clients may expose every named tool directly.
 
 - `list_recordings`: discover exact IDs for saved recordings owned by the signed-in user.
 - `get_recording`: inspect the exact recording, draft, source duration, output duration, clips, and revision. A Recorder assistant is bound to its recording; external clients supply `recordingId`.

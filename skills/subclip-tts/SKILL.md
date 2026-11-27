@@ -41,7 +41,7 @@ Use this path when the creator does not want to spend credits, or is offline. It
 3. Call `generate_local_speech` with the exact script and `voice`. For a language other than English pass `modelId: "subclip-local-supertonic"` and `language` (31 languages, voices `M1` to `M5` and `F1` to `F5`); `get_voice_samples` returns these arguments ready to use. It needs no confirmation and uses no credits. It returns the WAV `filePath`. Do not poll.
 4. Tell the creator where the file is and that it was made offline. Use `generate_speech` only when the creator asks for a cloud voice or a different model.
 
-Cloned voices are made from the AI Assets speech picker (Clone a voice offline): 3 to 30 seconds of clear speech from one speaker, with the creator's permission. Never clone a voice for someone who has not given permission.
+To clone a voice offline (free, nothing uploaded), call `clone_local_voice` yourself: pass a `name` and the speech source, either `filePath` (an audio or video file) or `sourceProjectId` + `mediaFileId` (a clip in a project), with `startSeconds`/`endSeconds` around 3 to 30 seconds where only that one person speaks clearly. Set `permissionConfirmed: true` only after the creator confirmed it is their own voice or they have the speaker's permission; never clone anyone else's voice. If the model is still downloading it says so: call again when `list_local_voices` shows it installed. Then use the returned `clone:...` id as `voice` in `generate_local_speech`. `delete_local_voice` removes a cloned voice. The creator can also clone from the AI Assets speech picker (Clone a voice offline). Offline clones speak English.
 
 ## Current model capabilities
 
