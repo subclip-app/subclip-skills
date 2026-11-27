@@ -73,6 +73,22 @@ Optional, and useful when showing the method: a small corner tag on each card ("
 - `export_video` only when the user asked; check `list_render_queue` first; poll `get_export_status`.
 - `extract_video_frames` on the exported MP4 at the same times for the final proof.
 
+## 8. Comparison video (optional)
+
+A vertical 1080x1920 project that shows the original and the edit in sync, so a reviewer sees what each card hides.
+
+| Part | How |
+|---|---|
+| Project | `create_project` with `canvasPreset: "vertical"`; `set_canvas_properties` with `backgroundColor: "#ffffff"` |
+| Two copies of the clip | `import_external_media` twice (same file, same trim), then `update_media_item` with `fitMode: "cover"`, `width: 1`, `height: 0.5625` and `positionX: 0`. Use `positionY: 0.153` for the top and `0.912` for the bottom. Media positions are top-left in canvas-width units (1 = 1080 px; the canvas is 1 x 1.778). Mute the top copy so the audio plays once. |
+| Edit cards on the bottom half | `read_layer_source` on each card of the edit, then `add_html_motion_graphic` with the same CSS and HTML wrapped in `<div class="wrap">` (`.wrap{position:absolute;left:0;top:0;width:1920px;height:1080px;transform:scale(.5625);transform-origin:0 0}`), at `width: 100`, `height: 31.667`, `x: 50`, `y: 67.14` (canvas percent, centre) |
+| Tags on the top half | one layer per window with a cyan frame and "will be covered: <reason>"; one per face-time gap with a blue frame and "camera look, kept"; `width: 100`, `height: 31.667`, `x: 50`, `y: 24.43` |
+| Labels | "Original" above the top half (`y: 5.5`), "Edited with Subclip" above the bottom half (`y: 48.7`); use `white-space: nowrap` |
+| Timeline bar | one layer for the whole duration between the halves (`y: 43.4`): a track with one block per window at `left = start / duration`, plus a playhead with `animation: mv <duration>s linear both` from `left: 0%` to `left: 100%` |
+| Credit | the source credit line in the footer for the last few seconds |
+
+Verify with one `get_timeline_contact_sheet` at the same times as step 7: top shows the look-away and its tag, bottom shows the card; at lens looks both halves show the face.
+
 ## Tool gaps (Nov 2026)
 
 - `extract_video_frames` returns full frames only (at most 8 per call, no crop, no tiling). A `crop` (`{x, y, width, height}` in source pixels or fractions) and a `contactSheet` option (`everySeconds`, `columns`, `tileSize`, time stamps) would make this skill one call per 24 s with no scratch project.
