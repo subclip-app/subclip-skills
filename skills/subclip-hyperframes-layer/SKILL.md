@@ -22,6 +22,8 @@ Layer source you read or write here is part of the Subclip project and Subclip's
 - Use `$subclip-remotion-layer` only when the creator explicitly asks for React/TSX/Remotion, selects a Remotion template, or requests edits to an existing Remotion layer.
 - Use native Text, Elements, Media, Audio, or Captions for work those panels already express cleanly.
 
+**Faces and the focus element stay clear (hard rule).** No text or graphic from this layer may sit on a person's face or on the element the viewer is meant to look at (product, hand, UI control, chart, the number being discussed), in any frame of its time range. Order of choices: empty space in the frame, another moment, smaller or shorter, reframe the clip or use a card or split layout, and only as the last option text between the subject and the background (`subclip-text-behind-subject`). Inside the graphic itself, labels and titles go beside its own key element or on a leader line, never on top of it. Look at the frames before placing and again after (first, middle, last frame, and after any cut or zoom in range). Full rule: `subclip-taste`, "Faces and the focus element stay clear".
+
 ## Fonts and sandbox resources
 
 This is a sandboxed layer runtime. A font, file, URL or package visible to the authoring agent is not automatically available to the preview or export renderer.

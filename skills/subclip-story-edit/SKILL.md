@@ -1,6 +1,6 @@
 ---
 name: subclip-story-edit
-description: Turn raw footage into a story in Subclip. Watch every clip first, log the takes (last take wins, false starts out), write a paper edit with timecodes (hook, setup, beats, payoff, call to action) before cutting, pick the best takes, cut dead air and filler, order for story and not for shooting order, add B-roll and graphics only where they serve a line, then hand over to pacing, sound mix and self-critique. Use when the creator hands over raw clips, a long recording or a messy timeline and wants a finished video, or asks to find the story, pick the good parts or fix the structure.
+description: The main skill when the creator asks for a video or an edit and gives no creative direction. Build the story before cutting, for any format (raw footage, podcast, vlog, SaaS demo, explainer, motion graphics, film, song): understand what you have, theme, overall story, script and storyboard, hook, confirm with the creator or score versions yourself, then edit. One flow from start to end with a hook, an introduction, value in beats, an open curiosity loop at every transition and the biggest payoff or twist last. Also covers watching every clip, logging takes (last take wins, false starts out), the paper edit with timecodes, best takes, dead air and filler, B-roll only where it serves a line, and the handover to pacing, sound mix and self-critique.
 ---
 
 # Subclip Story Edit
@@ -9,10 +9,48 @@ Most of an editor's time goes into watching footage, choosing the good parts and
 
 Tools for the cutting itself are in `subclip-rough-cut` (dead air, fillers), `subclip-timeline-story` (splits, order, lanes) and `subclip-text-captions` (script cuts).
 
+## Story first (the main path when the creator gave no creative direction)
+
+Use this whenever the creator hands over raw clips, a recording, a product, a song or a topic and says "edit this" or "make a video" without saying what the video should be. It applies to every format: talking head, podcast cut, vlog, SaaS demo, explainer, motion graphics, short film, music video, story. Long-form most of all. When the creator did give direction (a script, a storyboard, an order, a reference to follow), follow theirs and use this section only to check the flow.
+
+**The principle.** A video is one story from the first second to the last, not a pile of good moments in a shuffled order. The viewer must always have a reason to watch the next part:
+
+1. **Hook.** The opening answers "why watch this?" and promises something.
+2. **Introduce** the character or the main thing (the person, the product, the problem, the song's idea), and what is at stake.
+3. **Value, in beats.** One idea per beat, each building on the one before.
+4. **Curiosity loops.** Before leaving a beat, open a question the next beat or a later one answers ("but that only works until you hit this wall"). At every moment before the end at least one loop is open. A payoff may land early, and when it does, open another loop in the same breath. A twist counts as a loop.
+5. **Payoff at the end.** The biggest answer, result or twist lands last, and it pays off the hook's promise. Then the end screen or the one ask.
+
+A known shorthand for talking videos is Ali Abdaal's HIVES: hook, intro, value, end screen (and a sales pitch or call to action where one fits). Treat it as a shape, not a template: do not force section names or lengths onto material that tells its story another way. What is not optional is the flow: start, development, end, each part caused by the one before, nothing mixed up.
+
+**The steps, in order. Do not start cutting before step 6.**
+
+1. **Understand what we have.** Sections 1 and 2 below: watch everything, read the words, log the takes. For non-footage work (motion graphics, demo, explainer) list the facts, features, assets and proof you actually have.
+2. **Theme.** One sentence: what this video is about and who it is for. If you cannot write it, you are not ready.
+3. **Overall story.** Three to six lines: where it starts, what changes, where it ends, what the viewer gets. Name the promise of the hook and the final payoff here.
+4. **Script and storyboard**, in whichever order suits the material. Footage that already has words: storyboard first (which moments, in what order), then tighten the script by selection. Work you are writing from scratch: script first, then the storyboard. The storyboard is a table, one row per segment:
+
+   | # | Segment | Starts with | Ends with | Pays off | Leaves open | Picture and sound |
+   |---|---|---|---|---|---|---|
+   | 1 | Hook | "Sites grow to millions of clicks without new links" | "but you will hit a wall" | nothing yet | how, and what wall? | speaker close, title hit |
+   | 2 | Setup | the question | the surprising first answer | what the video is about | is it really true? | split shot, name tags |
+   | 3 | Beat 1 | the example | the number | "is it true?" | then why does it stop? | cutaway to the chart |
+   | ... | | | | | | |
+   | n | Payoff | the recap question | the one thing to do | the hook's promise, every open loop | nothing | end card |
+
+   Every row must have something in "Leaves open" except the last. A row with nothing in "Pays off" and nothing in "Leaves open" has no job: cut it or merge it.
+5. **Decide the hook last**, once the story exists: the strongest line, result or image that makes the promise the ending keeps. Write two or three candidates.
+6. **Confirm, or choose yourself.**
+   - Show the creator the theme, the overall story and the storyboard, short enough to read in a minute. When there is more than one good story, show two or three versions with your recommendation first, and let them pick or change segments.
+   - If the creator says "you decide", or cannot be asked: score each version from 1 to 10 on hook strength, clarity of the through-line, open loops at every transition, size of the final payoff, and whether the material you have can actually show it. State the scores, take the best, and go.
+   - Save the chosen theme, story and storyboard in the director brief (`update_project_director_brief`). Later steps and other agents work from it.
+7. **Edit to the storyboard.** Sections 3 to 5 below, then the other editing skills: `subclip-pacing`, `subclip-sound-mix`, captions, graphics, `subclip-taste`.
+8. **Critique against the storyboard**, not only against the rubric (`subclip-self-critique`, "Story cards").
+
 ## 1. Watch everything
 
 1. `list_editor_assets`, then `get_media_context` for the whole project with `includeContactSheet: true`. For files without context: `list_media_without_context`, `generate_media_context`, then look at the sheets and `describe_media`.
-2. Transcribe every clip with speech (`transcribe_project`, see `subclip-transcription`). Read it with `get_script`: words, times, pauses.
+2. Get the words for every clip with speech. A video fetched from a link (YouTube and similar) usually comes with a transcript: use the `transcript` file from `fetch_linked_media` and do not transcribe it. Otherwise transcribe by the policy in `subclip-transcription` (`transcribe_project`); do not turn on speaker detection without asking. Read it with `get_script`: words, times, pauses.
 3. For a clip that matters, look closer: `get_item_contact_sheet` once it is on the timeline (if it is not available in this app version, use `get_media_context` with `inspectAtSeconds` or `extract_video_frames`).
 4. Do not skip a clip because of its file name. The best moment is often in the take the creator forgot.
 

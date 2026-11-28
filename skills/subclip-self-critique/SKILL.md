@@ -15,12 +15,27 @@ If `review_segment`, `record_segment_review` or `list_segment_reviews` is not av
 2. **Review.** For each segment call `review_segment` with `startTime`, `endTime` and a `label` ("hook", "demo 2"). It returns `sheet`, `audio`, `pacing`, `text`, `items`, `rubric`, `reviewId` and `revision`.
 3. **Look.** Open the sheet image and read the tiles. Read every entry in `audio.issues`, `pacing.issues` and `text` findings. For a motion graphic or title in `items`, also call `get_item_contact_sheet` (if it is not available in this app version, `get_timeline_contact_sheet` with `times` inside the item). A review without looking is not a review.
 4. **Score.** One score per criterion, 1 to 10, or `null` when it does not apply (no captions in the segment, no music). Write the evidence first, then the number.
-5. **Record.** `record_segment_review` with the `reviewId`, your `agentLabel`, `scores`, `issues` (each with `time` or `itemId`, `problem`, `fix`), `verdict` and a one-sentence `summary`. It returns `overall`, `belowThreshold` and `nextAction`.
+5. **Record.** `record_segment_review` with the `reviewId`, your `agentLabel`, `scores`, `issues` (each with `time` or `itemId`, `problem`, `fix`), `verdict` and a `summary` that is the segment's story card (see "Story cards"). It returns `overall`, `belowThreshold` and `nextAction`.
 6. **Fix.** Every criterion in `belowThreshold` (under 7) gets fixed, using the skill that owns it: `subclip-pacing`, `subclip-sound-mix`, `subclip-taste`, `subclip-story-edit`, `subclip-motion-graphics`, `subclip-dynamic-captions`.
 7. **Review again.** Call `review_segment` for that same range (the edit made the old review stale) and record a new review. At most three rounds per segment. After the third, stop, keep `verdict: "fix"`, and report what remains.
-8. **Coverage.** `list_segment_reviews`: `coverage` must be 100, no review `stale`, `unreviewedRanges` empty. Edits to one segment can make its neighbours stale (a moved cut, a longer music bed): review those again.
-9. **Whole film.** One last pass over the full timeline: `get_pacing_analysis` and `get_audio_analysis` without a range (older app: `analyze_timeline` and `get_audio_timeline_sheet`), for the arc, loudness consistency and the joins between segments.
+8. **Coverage.** `list_segment_reviews`: `coverage` must be 100, no review `stale`, `unreviewedRanges` empty. Edits to one segment can make its neighbours stale (a moved cut): review those again. A change to an item that spans many segments makes every review it touches stale, not just the neighbours: the music bed, a full-length voice track, the project-wide caption style, a canvas or background change, a global volume change. So do those long-item and project-wide changes first, before the first review round, and after the last round do not touch them. If you must change one late, say so, re-run `review_segment` on every stale range and record the reviews again; never report scores from stale reviews as current.
+9. **Whole film.** Do the whole-video story check from "Story cards" (promise, payoff, loops, order). Then one last pass over the full timeline: `get_pacing_analysis` and `get_audio_analysis` without a range (older app: `analyze_timeline` and `get_audio_timeline_sheet`), for the arc, loudness consistency and the joins between segments.
 10. **Report** (below). Only then export, and only if asked.
+
+## Story cards
+
+Scores alone do not show whether the video tells a story. For every segment (scene, storyboard row, chapter), whatever the format, write a story card in the review `summary`, in this form:
+
+`Starts: <what it opens with>. Ends: <what it closes on>. Pays off: <which earlier question or promise it answers, or "none">. Leaves open: <the question that carries the viewer on, or "none, this is the end">.`
+
+Rules:
+
+- Take the planned card from the storyboard in the director brief (`subclip-story-edit`, "Story first") and compare it with what the segment actually does. A difference is an issue to record.
+- A segment that pays off nothing and leaves nothing open has no job. `story` is 5 at most until it is cut, merged or given one.
+- Any segment before the last with "Leaves open: none" drops the thread: `story` is 6 at most. Fix by ending it on the question the next part answers, or by reordering.
+- A segment that needs something the viewer has not seen yet (mixed-up order) caps `story` at 5.
+- Whole-video check, after all segments, written in the report: (1) the hook's promise in one line; (2) where it is paid off, with the time; (3) the list of loops, each with where it opens and where it closes; any loop never closed, and any stretch with no loop open, is a defect; (4) the biggest payoff or twist is in the final part, not the middle; (5) reading only the "Starts" and "Ends" lines top to bottom gives one continuous story.
+- This applies to motion graphics, product demos, music videos and explainers as much as to spoken video: their segments are scenes or storyboard frames, and their loops are visual or musical questions (what is this building toward, what does the product do next).
 
 ## Rubric
 
@@ -29,7 +44,7 @@ If `review_segment`, `record_segment_review` or `list_segment_reviews` is not av
 | Criterion | What a 9 looks like | Evidence to use |
 |---|---|---|
 | `hook` | first words and motion inside 1 s, the promise clear by 3 s (score only in the opening segment, else `null`) | `pacing.hook` |
-| `story` | every shot has a job, the line of thought is easy to follow, nothing repeats | transcript, sheet order |
+| `story` | every shot has a job, the line of thought is easy to follow, nothing repeats, the segment pays off or opens a question and hands the viewer to the next one | transcript, sheet order, the story card against the storyboard |
 | `pacing` | shot lengths fit the content, cuts on beat or word, no dead air, variation | `pacing` numbers and issues |
 | `audioMix` | voice clear everywhere, no masked speech, peaks safe, levels steady | `audio` speech gap, peaks, issues |
 | `musicFit` | energy follows the script beats, lift on the reveal, clean start and end | `audio` music sections against the words |
@@ -52,7 +67,7 @@ Score meaning:
 - Evidence per score: a tile number, a time, or a measured value. No evidence, no score above 6.
 - A 9 means there is nothing you would change. If you wrote an issue for that criterion, it is not a 9.
 - An open `error` issue from the tools caps that criterion at 5. An open `warn` caps it at 7.
-- Any `masked` speech caps `audioMix` at 5. Any `too-long` or `too-short` text item caps `motionGraphics` or `captions` at 6. Any lint finding left caps `taste` at 6.
+- Any `masked` speech caps `audioMix` at 5. Any `too-long` or `too-short` text item caps `motionGraphics` or `captions` at 6. Any lint finding left caps `taste` at 6. Any text or graphic on a face or on the focus element in any tile caps `captions` or `motionGraphics` (whichever owns the item) and `visualQuality` at 4, and the verdict is `"fix"`; the same cap applies to a label sitting on the key element inside a motion graphic.
 - Do not score what you did not look at. Use `null` and say why.
 - Score the segment as it is, not the effort spent or the plan for it.
 - Do not raise a score on re-review unless the measured value or the tile changed.

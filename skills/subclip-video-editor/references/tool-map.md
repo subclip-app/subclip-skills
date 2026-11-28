@@ -158,7 +158,7 @@ Relevant state roots are `canvasConfig`, `mediaData`, `audioData`, `subtitleData
 - `stop_transcription`: stop local Whisper, the desktop cloud job, and its active Subclip Cloud server run before replacing routes
 - `start_cloud_transcription`, `get_job_status`, `cancel_job`: asynchronous cloud flow
 
-Confirm before paid cloud work when the current request has not already authorized it. Speaker diarization is available only through Subclip Cloud. Use local transcription only for ordinary single-speaker work when the user explicitly asks for local/on-device/no-cloud processing. Call `stop_transcription` before replacing any active route.
+Mode (local or cloud), what to do when a route fails, and speaker detection follow the one policy in `subclip-transcription` ("Transcription policy" and "Speakers: always ask, never assume"): existing captions first, the creator's stated mode next, local for up to about 10 minutes, ask once for longer audio, and never turn on speaker detection without the creator saying yes. Confirm before paid cloud work when the current request has not already authorized it. Call `stop_transcription` before replacing any active route.
 ## Exact visual QA
 
 - `view_current_frame`: render a full composed PNG at an explicit project `timeSeconds`; optionally focus the review with `targetType` and `itemId` for media, text, elements, motion graphics, dynamic captions, or 3D.

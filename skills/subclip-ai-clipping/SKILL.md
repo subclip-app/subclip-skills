@@ -10,7 +10,7 @@ Create an editable clips-only candidate reel in the active project. Read [refere
 ## Workflow
 
 1. Inspect the request, director brief, source items, captions, and canvas. Honor an explicit canvas; otherwise use 9:16.
-2. Use a trustworthy timestamped host-provided YouTube transcript when present. Otherwise transcribe exact source `mediaItemId` values sequentially under the normal Cloud/local authorization rules. Keep that source transcript available until candidate caption ownership has been rebuilt.
+2. Use a trustworthy timestamped host-provided YouTube transcript when present. Otherwise transcribe exact source `mediaItemId` values sequentially by the policy in `subclip-transcription` (local up to about 10 minutes, ask once for longer audio, speaker detection only on the creator's yes). Keep that source transcript available until candidate caption ownership has been rebuilt.
 3. Select distinct, non-overlapping intervals using the reference scoring contract. Respect a requested count; otherwise keep the strongest 3–5 and never add weak filler candidates.
 4. Assemble candidate groups in source order beginning at exactly `1.0s`, with constituent pieces contiguous and exactly `2.0s` between groups. A request to make clips, shorts, reels, or highlights is clips-only intent by default: after the candidate reel and captions are verified, remove the original full-length timeline placements but keep their source files in Project Media. Preserve source placements only when the creator explicitly asks for a source-plus-candidates review timeline.
 5. Place native copies by file ID, convert timeline ranges to exact source in/out, and trim them non-destructively. Keep one audible copy per interval.

@@ -64,3 +64,7 @@ If the user reports missing elements in an exported video, identify their owning
 ## Publish individual clips
 
 If the user requests uploading the generated clips, read `subclip-youtube` (or `subclip-social-media` for other platforms). Use each candidate's saved OUTPUT timeline start/end range with a meaningful filename, preserve the reel, and export sequentially. Publish the resulting files directly with `youtube_upload_file` / `publish_video_file_to_social`, or publish the exact ranges with the segment tools. Do not clone one project per clip, delete other clips, or import/delete exported files in a temporary upload timeline. Obtain an exact per-item or reviewed batch publishing confirmation, including schedule mechanism and timezone, and keep operation/publication IDs for safe resume.
+
+## Credits for stock assets
+
+If the project uses stock music, sound effects, footage or images from Subclip's public libraries, end the export report with the ready-to-paste credits block and tell the creator to add it to the description wherever they post. See `subclip-public-assets`, "Licences and credits".

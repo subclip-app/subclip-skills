@@ -72,9 +72,38 @@ Copy:
 
 - One idea per scene. If two things compete, make two scenes.
 - Equal left and right edges across the whole video. Align to the same grid in every scene.
-- Never cover a face, the key UI or the captions with a card. Look before placing (`get_timeline_contact_sheet`).
+- Never cover a face, the focus element or the captions with text, a card or a graphic: see "Faces and the focus element stay clear" below for the placement order and checks.
 - One graphic at a time unless they are one design.
 - Leave empty space. A frame filled edge to edge reads as a template.
+
+## Faces and the focus element stay clear
+
+This is a hard rule for everything you put on screen, whatever made it: native text layers, captions, elements, HTML/CSS motion graphics, Remotion layers, HyperFrames layers, stickers, logos, callout plates and cards that do not fill the frame.
+
+**When the face part applies.** Only when people or characters are on screen: talking heads, interviews, podcasts, vlogs, acted scenes, animated or illustrated characters, mascots, avatars. A faceless video (screen recording, slides, product shots, maps, pure motion graphics, stock scenery without people) has no face to protect: skip the face check there and apply only the focus-element part. No special tool is needed for this: the contact sheet you already look at shows whether anyone is on screen and where.
+
+**Never place text or a graphic on a face.** That means the whole head (forehead to chin, ear to ear) plus a small margin, for every person in the shot, in every frame the item is visible, including after a punch-in zoom or a cut to another angle while the item is still up.
+
+**Never place text or a graphic on the focus element.** The focus element is whatever the viewer is meant to look at in that moment: the product, the hand doing the action, the UI control being clicked, the chart or number being discussed, the object the narration names.
+
+Where to put it instead, in this order:
+
+1. **Empty space in the frame**: wall, sky, desk, the side the speaker is not on. For a centred talking head that is usually the left or right third or the lower band under the chin line; on a split shot, the gutter or the lower band.
+2. **Another moment**: move the item to a beat where the frame has room, or to the cut before or after.
+3. **Smaller or shorter**: shrink it, break it into two lines, or shorten the words until it fits the free area.
+4. **Change the frame**: reframe or scale the clip to open space (speaker to one side, text on the other), or put the item on its own card or split layout.
+5. **Last option, text between the subject and the background**: remove the background of a duplicate of the clip and put the text between the two (`subclip-text-behind-subject`). The subject then covers the text, never the reverse. Use it only when 1 to 4 do not work or the creator asks for that look, because it costs processing time and can fail on hair and fast motion.
+
+Never solve it by lowering the item's opacity over the face, and never by a backing plate that itself covers the face.
+
+**Inside a motion graphic the same rule applies to its own contents.** A graphic has one key element per scene (the product shot, the chart line, the big number, the logo, the screenshot region being discussed). Labels, titles, captions and decorations go beside it, in the reserved margin, or on a callout line pointing at it. They do not sit on top of it. If a label has to touch it, use a leader line and put the label outside.
+
+How to check, every time:
+
+1. Before placing: look at the frames across the item's whole time range (`get_timeline_contact_sheet` with `times`, or `view_frame`), not one frame. People move and shots change.
+2. Decide the free area first, then give the item that area (position and size), then write its content.
+3. After placing: render the same times again and look at the first, middle and last frame of the item, plus any frame right after a cut or zoom inside its range.
+4. If any frame shows text or a graphic on a face or on the focus element, it is not done. Move it and look again.
 
 ## Consistency
 
@@ -101,6 +130,7 @@ Check across the video, not per card: `get_timeline_contact_sheet` with `at: "la
 - One or two font families, one size scale, one colour system.
 - One hero move; consistent easing; nothing stacked; nothing lingers.
 - Text inside safe margins and clear of faces and UI.
+- No text or graphic on a face or on the focus element in any frame of its range, checked on first, middle and last frame; inside motion graphics, labels sit beside the key element, not on it.
 - First and last graphic match.
 - Nothing from the ban list on screen.
 

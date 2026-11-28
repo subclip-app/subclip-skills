@@ -13,6 +13,10 @@ Build one editable three-plane composite in the requested segment:
 
 Use Subclip's `subclip_ai_editor` MCP server. Load `subclip-background-removal` for the removal lifecycle and `subclip-text-captions` or `subclip-dynamic-captions` for the chosen middle layer. Never remove or replace the base item's background.
 
+## When to use it
+
+Use it when the creator asks for the text-behind-subject look, or as the last option when text must share the frame with a person or a focus element and no free area, other moment, smaller size or reframe works (order in `subclip-taste`, "Faces and the focus element stay clear"). Text must never sit in front of a face; this technique is how text and subject overlap with the subject on top.
+
 ## Resolve the request before processing
 
 1. Read `active-project` and call `list_editor_assets`. Resolve the exact requested timeline segment and the one base MediaPanel item visible behind the intended subject. Never infer a target when multiple overlapping media items could be the plate.

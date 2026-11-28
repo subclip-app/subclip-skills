@@ -27,7 +27,7 @@ Then map source time proportionally into that file's waveform array.
 ## Transcription loop
 
 - Transcribe every surviving audible video item by exact `mediaItemId`, in timeline order and one terminal job at a time.
-- Prefer Subclip Cloud; ask once when credit use is not already authorized. Use local Whisper only for an explicit local/offline/on-device/no-cloud request.
+- Mode (local or cloud), what to do when a route fails, and speaker detection follow the one policy in `subclip-transcription` ("Transcription policy" and "Speakers: always ask, never assume"): existing captions first, the creator's stated mode next, local for up to about 10 minutes, ask once for longer audio, and never turn on speaker detection without the creator saying yes.
 - Before each job, write completed and pending item IDs to the director brief. Store the returned job ID and end the turn. On resume, verify the exact source item's saved words before starting the next.
 
 ## Filler policy

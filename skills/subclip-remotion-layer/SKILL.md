@@ -20,6 +20,8 @@ Layer source you read or write here is part of the Subclip project and Subclip's
 - Use `$subclip-motion-graphics` to route a general motion-design request. Its script-free HTML/CSS path is only the fallback when that result is materially smaller.
 - Prefer native Text, Elements, Media, Audio, or Captions when they express the requested edit cleanly.
 
+**Faces and the focus element stay clear (hard rule).** No text or graphic from this layer may sit on a person's face or on the element the viewer is meant to look at (product, hand, UI control, chart, the number being discussed), in any frame of its time range. Order of choices: empty space in the frame, another moment, smaller or shorter, reframe the clip or use a card or split layout, and only as the last option text between the subject and the background (`subclip-text-behind-subject`). Inside the graphic itself, labels and titles go beside its own key element or on a leader line, never on top of it. Look at the frames before placing and again after (first, middle, last frame, and after any cut or zoom in range). Full rule: `subclip-taste`, "Faces and the focus element stay clear".
+
 ## Export-safe CSS (client-side rendering)
 
 Subclip exports Remotion layers with Remotion's client-side renderer, which re-draws elements from their computed styles and silently drops anything it does not implement. The preview is a real browser, so an unsupported style looks right in preview and is missing from the exported video. Read [references/client-side-rendering.md](references/client-side-rendering.md) before authoring and follow it over any upstream example.

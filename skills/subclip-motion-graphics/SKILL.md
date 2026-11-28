@@ -71,6 +71,8 @@ When no exact geometry is requested and the inspected frame is empty, use a cent
 
 Author the markup and styles for the reserved rectangle, not for the entire video canvas. Treat the Motion item's own box as its local coordinate system: make the root fill that box, keep internal layout responsive to it, and avoid invisible full-frame wrappers, oversized hit areas, or decorative surfaces outside the reserved region. If later inspection shows the graphic needs different space, update the same item's geometry first and then adapt its HTML/CSS to the new box.
 
+**Faces and the focus element stay clear (hard rule).** No text or graphic from this layer may sit on a person's face or on the element the viewer is meant to look at (product, hand, UI control, chart, the number being discussed), in any frame of its time range. Order of choices: empty space in the frame, another moment, smaller or shorter, reframe the clip or use a card or split layout, and only as the last option text between the subject and the background (`subclip-text-behind-subject`). Inside the graphic itself, labels and titles go beside its own key element or on a leader line, never on top of it. Look at the frames before placing and again after (first, middle, last frame, and after any cut or zoom in range). Full rule: `subclip-taste`, "Faces and the focus element stay clear".
+
 ## Official SVG assets
 
 MediaPanel does not register standalone `.svg` files. When the creator supplies an official SVG logo, icon, illustration, or map, keep it vector by placing its exact sanitized markup inline in a Motion Graphics item instead of converting it to PNG.

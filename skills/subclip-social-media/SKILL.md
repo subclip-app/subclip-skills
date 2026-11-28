@@ -19,3 +19,7 @@ Read `get_social_status` and `list_social_accounts` for connected owned accounts
 For an existing authorized file use `publish_video_file_to_social`; for a timeline range use `publish_video_segment_to_social`. Neither requires an upload project or timeline replacement. The user chooses the platform and account. Review rendered captions, all supporting text/settings, files/ranges and timing before confirmation. For an explicitly reviewed batch, keep a per-item ledger and process sequentially. Treat accepted as pending; confirm external proof before claiming upload/publication success. Internal assistant file/renderer publishing resumes automatically: store the exact operation/request ID and end the turn without polling. External clients can use the status tools.
 
 Do not echo credentials. Do not promise features absent from get_social_status. Read-only questions and capability inspection never authorize publishing, replies, account changes or deletion.
+
+## Credits for stock assets
+
+When the video uses stock music, sound effects, footage or images from Subclip's public libraries, append the project's credits block to the end of the description under a "Credits" line before publishing, and show it in the summary the creator confirms. Collect the lines from each asset's stored attribution (`get_media_context`). See `subclip-public-assets`, "Licences and credits".

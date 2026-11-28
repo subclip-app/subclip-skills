@@ -21,6 +21,8 @@ Two pieces of state matter. The native captions own the words and timing (they s
 7. **Verify with a short ranged export.** Exports run only on the creator's request, so offer it or use it when they asked for a check: `export_video` with `startTime`/`endTime` over a few seconds that include a cue (see `$subclip-export`), never the whole video, then inspect the result.
 8. **Record the result.** Mention the style id, preset, and that native captions are hidden (not deleted) in your session summary.
 
+**Faces and the focus element stay clear (hard rule).** No text or graphic from this layer may sit on a person's face or on the element the viewer is meant to look at (product, hand, UI control, chart, the number being discussed), in any frame of its time range. Order of choices: empty space in the frame, another moment, smaller or shorter, reframe the clip or use a card or split layout, and only as the last option text between the subject and the background (`subclip-text-behind-subject`). Inside the graphic itself, labels and titles go beside its own key element or on a leader line, never on top of it. Look at the frames before placing and again after (first, middle, last frame, and after any cut or zoom in range). Full rule: `subclip-taste`, "Faces and the focus element stay clear".
+
 ## Rules
 
 - Captions are clamped to the project's current duration and the project duration is never changed; the result reports stray words past the end that were left out. Groups also break at the native caption page ends.

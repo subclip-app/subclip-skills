@@ -111,3 +111,7 @@ Tell the creator the numbers: mix loudness, true peak, voice to music gap during
 - `get_audio_analysis` run again after the last audio change and its `issues` read.
 
 Cue-sheet method, effect timing and "verify by looking at the sound" adapted from earshot by Leon Lin (MIT), https://github.com/Leonxlnx/earshot.
+
+## Credits
+
+Stock music and effects from `search_public_audio` are cleared for use. Record each one's attribution as you import it and hand the creator the credits block at the end; when Subclip publishes for them, it goes at the end of the description. See `subclip-public-assets`, "Licences and credits".

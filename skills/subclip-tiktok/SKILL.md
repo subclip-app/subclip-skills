@@ -38,3 +38,7 @@ Editing or deleting a published TikTok video is not available through TikTok's p
 ## Log
 
 Write what was posted into the project log (`write_session_summary`): the account, mode, privacy, caption, time and the publication id, so the next agent and the user can see it.
+
+## Credits for stock assets
+
+When the video uses stock music, sound effects, footage or images from Subclip's public libraries, append the project's credits block to the end of the description under a "Credits" line before publishing, and show it in the summary the creator confirms. Collect the lines from each asset's stored attribution (`get_media_context`). See `subclip-public-assets`, "Licences and credits".

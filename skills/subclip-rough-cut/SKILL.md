@@ -19,7 +19,7 @@ Produce an editable first assembly, not a polished social edit. Read [references
 
 1. Inspect the active project and asset inventory; resolve/import every requested source in creator order.
 2. Build the compact lane-0 sequence, then perform the conservative waveform silence pass from the reference.
-3. Re-list the surviving items and transcribe each exact `mediaItemId`, sequentially. Follow normal Cloud authorization and local-only-on-request rules; persist pending IDs before each background callback.
+3. Re-list the surviving items. For a source fetched from a link that came with a transcript (`fetch_linked_media` `transcript`), import its cues with `import_caption_cues_for_media_item` and skip recognition for that item. Transcribe each remaining exact `mediaItemId`, sequentially. Follow normal Cloud authorization and local-only-on-request rules; persist pending IDs before each background callback.
 4. Derive only high-confidence standalone filler ranges from the saved words, refine them at nearby quiet boundaries, and merge adjacent ranges.
 5. Split and delete those media ranges latest-to-earliest. Let native ripple deletion remove and shift owned captions; do not delete the same captions separately first.
 6. Re-read state, set duration to the final surviving content end, and verify representative joins and the final frame.

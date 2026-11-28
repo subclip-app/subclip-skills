@@ -7,7 +7,7 @@ description: Translate and dub an existing Subclip timeline audio/video item und
 
 The assistant owns translation and semantic timing decisions. MCP tools own source extraction, temporary voice lifecycle, speech generation, measurement, placement, accounting, and cleanup.
 
-1. Identify one exact audible `mediaItemId` or `audioItemId`. If it lacks exact-item captions, look for a saved transcript with `list_reference_transcripts`; otherwise call `transcribe_project` with `purpose: "reference"`. For multiple speakers use `mode: "cloud"` and `detectSpeakers: true`; wait for its terminal callback.
+1. Identify one exact audible `mediaItemId` or `audioItemId`. If it lacks exact-item captions, look for a saved transcript with `list_reference_transcripts`; otherwise call `transcribe_project` with `purpose: "reference"`. Follow the policy in `subclip-transcription`. If the source has more than one speaker, ask the creator once whether they want separate voices per speaker; on a yes use `mode: "cloud"` and `detectSpeakers: true` (about 12 minutes per run), otherwise dub as one voice. Wait for its terminal callback.
 2. Call `create_dubbing_workspace` for that item, passing `referenceTranscriptId` when using a saved reference transcript. Read every page with `get_dubbing_workspace`. Keep segment IDs, speaker IDs, and timing windows unchanged.
 3. Translate each segment yourself and call `update_dubbing_translations`. Preserve meaning, intent, names, numbers, dates, negation, calls to action, and other returned `lockedTerms`.
    - Prefer a natural concise equivalent before paid TTS when a translation is marked `likely-overflow`.

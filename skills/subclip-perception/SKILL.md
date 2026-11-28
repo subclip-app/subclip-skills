@@ -40,7 +40,7 @@ Before editing:
 1. `get_media_context` for every source file you will use. Never cut footage you have not looked at.
 2. `analyze_timeline` when the timeline already has content.
 3. `get_script` when there is speech. The words decide the story.
-4. `get_audio_analysis` and `get_pacing_analysis` over the whole timeline, once. Note the baseline: cuts per minute, voice LUFS, voice to music gap, bpm.
+4. `get_audio_analysis` and `get_pacing_analysis` over the whole timeline. `get_audio_analysis` measures at most 300 s per call and says so when it cuts a range short ("The range was cut to 300 s"): on a longer timeline call it in consecutive ranges of 300 s or less (0 to 300, 300 to 600 and so on) and combine the results; never treat one call as the whole video. Note the baseline: cuts per minute, voice LUFS, voice to music gap, bpm.
 5. One `get_timeline_contact_sheet` with `at: "auto"`.
 6. Write down what you perceived in three or four lines before planning.
 

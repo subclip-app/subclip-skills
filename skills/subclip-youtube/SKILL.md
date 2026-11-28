@@ -52,3 +52,7 @@ Discover each schema rather than guessing parameters:
 A private upload is the review-before-publication alternative; there is no exposed YouTube Studio video-draft upload. Shorts Related video is not an exposed Data API field; direct the user to Studio after upload. Eligibility and channel features remain YouTube-controlled. Literal `| @handle` text may be used in title/description, but do not promise a clickable mention. Shorts description URLs are not clickable; channel profile links and the Studio related-video link are alternatives. Do not download, export, publish or mutate merely while answering a capability question.
 
 Sources: [video updates](https://developers.google.com/youtube/v3/docs/videos/update), [Analytics](https://developers.google.com/youtube/analytics/reference/reports/query), [Shorts related videos](https://support.google.com/youtube/answer/14075157), [clickable links](https://support.google.com/youtube/answer/13748639).
+
+## Credits for stock assets
+
+When the video uses stock music, sound effects, footage or images from Subclip's public libraries, append the project's credits block to the end of the description under a "Credits" line before publishing, and show it in the summary the creator confirms. Collect the lines from each asset's stored attribution (`get_media_context`). See `subclip-public-assets`, "Licences and credits".

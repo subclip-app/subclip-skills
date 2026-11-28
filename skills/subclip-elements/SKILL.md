@@ -21,6 +21,8 @@ Use native `elementData.items` through the named Element tools. Elements are edi
 
 For a composed multi-part mechanism whose layout cannot be represented as a small set of Elements and keyframes, route to `$subclip-motion-graphics` instead.
 
+**Faces and the focus element stay clear (hard rule).** No text or graphic from this layer may sit on a person's face or on the element the viewer is meant to look at (product, hand, UI control, chart, the number being discussed), in any frame of its time range. Order of choices: empty space in the frame, another moment, smaller or shorter, reframe the clip or use a card or split layout, and only as the last option text between the subject and the background (`subclip-text-behind-subject`). Inside the graphic itself, labels and titles go beside its own key element or on a leader line, never on top of it. Look at the frames before placing and again after (first, middle, last frame, and after any cut or zoom in range). Full rule: `subclip-taste`, "Faces and the focus element stay clear".
+
 ## Perspective tilt
 
 Use `update_element` with optional `tiltX`, `tiltY`, and `tiltZ` fields in degrees, each from -88 to +88. X tilts vertically, Y tilts horizontally, and Z rotates in the image plane. These static appearance controls preserve existing animation and are editable under Perspective tilt in the layer settings. Use small angles for legibility; never add a back face or substitute a 3D model. Set all three to 0 to reset. For text overlays use update_text_item with the exact itemId; update_caption_style changes project-wide captions.
